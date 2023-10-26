@@ -21,21 +21,34 @@ function init_matrix(panel_w, panel_h)
   return panels
 end
 
-function possible_directions()
-  local directions = {}
-  if (blank % dim_x != 1) add(directions, blank - 1)
-  if (blank % dim_x != 0) add(directions, blank + 1)
-  if (blank - dim_x >= 1) add(directions, blank - dim_x)
-  if (blank + dim_x <= #order) add(directions, blank + dim_x)
-  return directions
+moves = {
+  [⬅️] = {['is_possible'] = function() return blank % dim_x != 0 end, ['v'] = 1}, -- left
+  [➡️] = {['is_possible'] = function() return blank % dim_x != 1 end, ['v'] = -1}, --right
+  [⬆️] = {['is_possible'] = function() return blank + dim_x <= #order end, ['v'] = dim_x}, -- up
+  [⬇️] = {['is_possible'] = function() return blank - dim_x >= 1 end, ['v'] = -dim_x}, -- down
+}
+
+function possible_moves()
+  local possible_moves = {}
+  for i, move in pairs(moves) do
+    if (move.is_possible()) add(possible_moves, move)
+  end
+  return possible_moves
 end
 
 function shuffle(order)
-  local directions = possible_directions()
-  local destination = directions[flr(rnd(#directions)) + 1]
+  local possible_moves = possible_moves()
+  local destination = blank + possible_moves[flr(rnd(#possible_moves)) + 1].v
   order[blank], order[destination] = order[destination], order[blank]
   blank = destination
   return order
+end
+
+function is_complete()
+  for i = 1, #order do
+    if (i != order[i]) return false
+  end
+  return true
 end
 
 function render()
@@ -52,7 +65,8 @@ function render()
 end
 
 function render_complete()
-  -- TODO
+  cls()
+  print('you win', 50, 60, 7)
 end
 
 --
@@ -67,14 +81,39 @@ states.wait = {
 }
 
 states.shuffle = {
-  ['count'] = dim_x * dim_y * 8 * 5,
+  ['count'] = dim_x * dim_y * 8 * 2,
   ['update'] = function (self)
-    if (self.count % 5 == 0) order = shuffle(order)
+    if (self.count % 2 == 0) order = shuffle(order)
     self.count-= 1
-    if (self.count == 0) state = 'wait'
+    if (self.count == 0) state = 'game'
   end,
   ['draw'] = function (self)
     render()
+  end,
+}
+
+states.game = {
+  ['update'] = function (self)
+    if (is_complete()) state = 'complete'
+
+    for key, move in pairs(moves) do
+      if btnp(key) and move.is_possible() then
+        local destination = blank + move.v
+        order[blank], order[destination] = order[destination], order[blank]
+        blank = destination
+      end
+    end
+  end,
+  ['draw'] = function (self)
+    render()
+  end,
+}
+
+states.complete = {
+  ['update'] = function (self)
+  end,
+  ['draw'] = function (self)
+    render_complete()
   end,
 }
 
@@ -83,7 +122,10 @@ state = nil
 function _init()
   board = init_matrix(128 / dim_x, 128 / dim_y)
   panels = init_matrix(128 / dim_x, 128 / dim_y)
-  order = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}
+  order = {}
+  for i = 1, dim_x * dim_y do
+    add(order, i)
+  end
 
   state = 'shuffle'
 end
