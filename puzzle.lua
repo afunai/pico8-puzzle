@@ -5,16 +5,16 @@ local panels = {}
 local order = {}
 local blank = dim_x * dim_y
 
-border = 2 / 32
+border = 2
 function init_matrix(panel_w, panel_h)
   local panels = {}
   for y = 1, dim_y do
     for x = 1, dim_x do
       add(panels, {
-        ['x'] = (x - 1) * panel_w + panel_w * border / 2,
-        ['y'] = (y - 1) * panel_h + panel_h * border / 2,
-        ['width'] = panel_w - panel_w * border,
-        ['height'] = panel_h - panel_h * border,
+        ['x'] = (x - 1) * panel_w + border / 2,
+        ['y'] = (y - 1) * panel_h + border / 2,
+        ['width'] = panel_w - border,
+        ['height'] = panel_h - border,
       })
     end
   end
