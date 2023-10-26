@@ -3,6 +3,7 @@ local dim_x, dim_y = 4, 4
 local board ={}
 local panels = {}
 local order = {}
+local blank = dim_x * dim_y
 
 border = 2 / 32
 function init_matrix(panel_w, panel_h)
@@ -14,27 +15,26 @@ function init_matrix(panel_w, panel_h)
         ['y'] = (y - 1) * panel_h + panel_h * border / 2,
         ['width'] = panel_w - panel_w * border,
         ['height'] = panel_h - panel_h * border,
-        ['blank'] = (x == dim_x and y == dim_y),
       })
     end
   end
   return panels
 end
 
-function shuffle(order)
-  local blank
-  for i = 1, #order do
-    if (order[i] == #order) blank = i
-  end
-
+function possible_directions()
   local directions = {}
   if (blank % dim_x != 1) add(directions, blank - 1)
   if (blank % dim_x != 0) add(directions, blank + 1)
   if (blank - dim_x >= 1) add(directions, blank - dim_x)
   if (blank + dim_x <= #order) add(directions, blank + dim_x)
+  return directions
+end
 
+function shuffle(order)
+  local directions = possible_directions()
   local destination = directions[flr(rnd(#directions)) + 1]
   order[blank], order[destination] = order[destination], order[blank]
+  blank = destination
   return order
 end
 
@@ -42,7 +42,7 @@ function render()
   cls()
   for i, cell in pairs(board) do
     local panel = panels[order[i]]
-    if panel.blank == false then
+    if i != blank then
       -- TODO
       rectfill(cell.x, cell.y,
         cell.x + cell.width, cell.y + cell.height, 3)
