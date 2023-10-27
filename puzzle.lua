@@ -54,8 +54,8 @@ end
 function render()
   cls()
   for i, cell in pairs(board) do
-    local panel = panels[order[i]]
     if i != blank then
+      local panel = panels[order[i]]
       -- TODO
       rectfill(cell.x, cell.y,
         cell.x + cell.width, cell.y + cell.height, 3)
@@ -65,8 +65,7 @@ function render()
 end
 
 function render_complete()
-  cls()
-  print('you win', 50, 60, 7)
+  print('you win', 51, 60, 7)
 end
 
 --
