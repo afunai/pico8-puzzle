@@ -64,6 +64,15 @@ function render()
   end
 end
 
+function render_cursor()
+  local f = cos(time()) * 2.5
+  local b_cell = board[blank]
+  if (moves[⬅️].is_possible()) print('⬅️', b_cell.x + b_cell.width + 3 * f - 6, b_cell.y + b_cell.height / 2 - 3, 7)
+  if (moves[➡️].is_possible()) print('➡️', b_cell.x - 3 * f, b_cell.y + b_cell.height / 2 - 3, 7)
+  if (moves[⬆️].is_possible()) print('⬆️', b_cell.x + b_cell.width / 2 - 3, b_cell.y + b_cell.height + 3 * f - 6, 7)
+  if (moves[⬇️].is_possible()) print('⬇️', b_cell.x + b_cell.width / 2 - 3, b_cell.y - 3 * f + 3, 7)
+end
+
 function render_complete()
   print('you win', 51, 60, 7)
 end
@@ -105,6 +114,7 @@ states.game = {
   end,
   ['draw'] = function (self)
     render()
+    render_cursor()
   end,
 }
 
