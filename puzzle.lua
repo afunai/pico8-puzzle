@@ -4,6 +4,7 @@ local board ={}
 local panels = {}
 local order = {}
 local blank = dim_x * dim_y
+local active_cell_id = 10
 
 border = 2
 function init_matrix(panel_w, panel_h)
@@ -22,25 +23,35 @@ function init_matrix(panel_w, panel_h)
 end
 
 moves = {
-  [⬅️] = {['is_possible'] = function() return blank % dim_x != 0 end, ['v'] = 1}, -- left
-  [➡️] = {['is_possible'] = function() return blank % dim_x != 1 end, ['v'] = -1}, --right
-  [⬆️] = {['is_possible'] = function() return blank + dim_x <= #order end, ['v'] = dim_x}, -- up
-  [⬇️] = {['is_possible'] = function() return blank - dim_x >= 1 end, ['v'] = -dim_x}, -- down
+  [⬅️] = {
+    ['is_possible'] = function(cell_id) return cell_id == blank + 1 and blank % dim_x != 0 end,
+    ['v'] = -1},
+  [➡️] = {
+    ['is_possible'] = function(cell_id) return cell_id == blank - 1 and blank % dim_x != 1 end,
+    ['v'] = 1},
+  [⬆️] = {
+    ['is_possible'] = function(cell_id) return cell_id == blank + dim_x end,
+    ['v'] = -dim_x},
+  [⬇️] = {
+    ['is_possible'] = function(cell_id) return cell_id == blank - dim_x end,
+    ['v'] = dim_x},
 }
 
 function possible_moves()
   local possible_moves = {}
-  for i, move in pairs(moves) do
-    if (move.is_possible()) add(possible_moves, move)
+  for cell_id, panel_id in pairs(order) do
+    for key, move in pairs(moves) do
+      if (move.is_possible(cell_id)) add(possible_moves, cell_id)
+    end
   end
   return possible_moves
 end
 
 function shuffle(order)
   local possible_moves = possible_moves()
-  local destination = blank + possible_moves[flr(rnd(#possible_moves)) + 1].v
-  order[blank], order[destination] = order[destination], order[blank]
-  blank = destination
+  local cell_id = possible_moves[flr(rnd(#possible_moves)) + 1]
+  order[blank], order[cell_id] = order[cell_id], order[blank]
+  blank = cell_id
   return order
 end
 
@@ -55,22 +66,28 @@ function render()
   cls()
   for i, cell in pairs(board) do
     if i != blank then
-      local panel = panels[order[i]]
+      local panel_id = order[i]
       -- TODO
       rectfill(cell.x, cell.y,
         cell.x + cell.width, cell.y + cell.height, 3)
-      print(order[i], cell.x + 2, cell.y + 2, 0)
+      print(panel_id, cell.x + 2, cell.y + 2, 0)
     end
   end
 end
 
 function render_cursor()
-  local f = cos(time()) * 2.5
-  local b_cell = board[blank]
-  if (moves[⬅️].is_possible()) print('⬅️', b_cell.x + b_cell.width + 3 * f - 6, b_cell.y + b_cell.height / 2 - 3, 7)
-  if (moves[➡️].is_possible()) print('➡️', b_cell.x - 3 * f, b_cell.y + b_cell.height / 2 - 3, 7)
-  if (moves[⬆️].is_possible()) print('⬆️', b_cell.x + b_cell.width / 2 - 3, b_cell.y + b_cell.height + 3 * f - 6, 7)
-  if (moves[⬇️].is_possible()) print('⬇️', b_cell.x + b_cell.width / 2 - 3, b_cell.y - 3 * f + 3, 7)
+  local moveable = false
+  for key, move in pairs(moves) do
+    if (move.is_possible(active_cell_id)) moveable = true
+  end
+
+  local cell = board[active_cell_id]
+  if moveable then
+    if (time() * 2 % 1 > .5) fillp(0b1010010110100101) else fillp(0b0101101001011010)
+  end
+  rect(cell.x - 1, cell.y - 1,
+    cell.x + cell.width + 1, cell.y + cell.height + 1, 7)
+  fillp(0)
 end
 
 function render_complete()
@@ -104,11 +121,18 @@ states.game = {
   ['update'] = function (self)
     if (is_complete()) state = 'complete'
 
-    for key, move in pairs(moves) do
-      if btnp(key) and move.is_possible() then
-        local destination = blank + move.v
-        order[blank], order[destination] = order[destination], order[blank]
-        blank = destination
+    if (btnp(⬅️) and active_cell_id % 4 != 1) active_cell_id -= 1
+    if (btnp(➡️) and active_cell_id % 4 != 0) active_cell_id += 1
+    if (btnp(⬆️) and active_cell_id > dim_x) active_cell_id -= dim_x
+    if (btnp(⬇️) and active_cell_id <= dim_x * (dim_y - 1)) active_cell_id += dim_x
+
+    if btnp(❎) then
+      for key, move in pairs(moves) do
+        if move.is_possible(active_cell_id) then
+          order[blank], order[active_cell_id] = order[active_cell_id], order[blank]
+          blank, active_cell_id = active_cell_id, blank
+          break
+        end
       end
     end
   end,
@@ -132,8 +156,8 @@ function _init()
   board = init_matrix(128 / dim_x, 128 / dim_y)
   panels = init_matrix(128 / dim_x, 128 / dim_y)
   order = {}
-  for i = 1, dim_x * dim_y do
-    add(order, i)
+  for panel_id = 1, dim_x * dim_y do
+    add(order, panel_id)
   end
 
   state = 'shuffle'
