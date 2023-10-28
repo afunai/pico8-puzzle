@@ -62,16 +62,17 @@ function is_complete()
   return true
 end
 
+function render_panel(panel_id, cell)
+  -- TODO
+  rectfill(cell.x, cell.y,
+    cell.x + cell.width - 1, cell.y + cell.height - 1, 3)
+  print(panel_id, cell.x + 2, cell.y + 2, 0)
+end
+
 function render()
   cls()
   for i, cell in pairs(board) do
-    if i != blank then
-      local panel_id = order[i]
-      -- TODO
-      rectfill(cell.x, cell.y,
-        cell.x + cell.width - 1, cell.y + cell.height - 1, 3)
-      print(panel_id, cell.x + 2, cell.y + 2, 0)
-    end
+    if (i != blank) render_panel(order[i], cell)
   end
 end
 
