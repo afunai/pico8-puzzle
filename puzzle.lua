@@ -69,7 +69,7 @@ function render()
       local panel_id = order[i]
       -- TODO
       rectfill(cell.x, cell.y,
-        cell.x + cell.width, cell.y + cell.height, 3)
+        cell.x + cell.width - 1, cell.y + cell.height - 1, 3)
       print(panel_id, cell.x + 2, cell.y + 2, 0)
     end
   end
@@ -86,7 +86,7 @@ function render_cursor()
     if (time() * 2 % 1 > .5) fillp(0b1010010110100101) else fillp(0b0101101001011010)
   end
   rect(cell.x - 1, cell.y - 1,
-    cell.x + cell.width + 1, cell.y + cell.height + 1, 7)
+    cell.x + cell.width, cell.y + cell.height, 7)
   fillp(0)
 end
 
