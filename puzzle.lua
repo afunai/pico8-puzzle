@@ -2,7 +2,7 @@ local dim_x, dim_y = 4, 4
 
 local board ={}
 local panels = {}
-local order = {}
+local panel_ids = {}
 local blank = dim_x * dim_y
 local active_cell_id = 10
 
@@ -39,7 +39,7 @@ moves = {
 
 function possible_moves()
   local possible_moves = {}
-  for cell_id, panel_id in pairs(order) do
+  for cell_id, panel_id in pairs(panel_ids) do
     for key, move in pairs(moves) do
       if (move.is_possible(cell_id)) add(possible_moves, cell_id)
     end
@@ -47,17 +47,17 @@ function possible_moves()
   return possible_moves
 end
 
-function shuffle(order)
+function shuffle(panel_ids)
   local possible_moves = possible_moves()
   local cell_id = possible_moves[flr(rnd(#possible_moves)) + 1]
-  order[blank], order[cell_id] = order[cell_id], order[blank]
+  panel_ids[blank], panel_ids[cell_id] = panel_ids[cell_id], panel_ids[blank]
   blank = cell_id
-  return order
+  return panel_ids
 end
 
 function is_complete()
-  for i = 1, #order do
-    if (i != order[i]) return false
+  for i = 1, #panel_ids do
+    if (i != panel_ids[i]) return false
   end
   return true
 end
@@ -75,7 +75,7 @@ end
 function render_board()
   cls()
   for i, cell in pairs(board) do
-    if (i != blank) render_panel(order[i], cell)
+    if (i != blank) render_panel(panel_ids[i], cell)
   end
 end
 
@@ -112,7 +112,7 @@ states.wait = {
 states.shuffle = {
   ['count'] = dim_x * dim_y * 8 * 2,
   ['update'] = function (self)
-    if (self.count % 2 == 0) order = shuffle(order)
+    if (self.count % 2 == 0) panel_ids = shuffle(panel_ids)
     self.count-= 1
     if (self.count == 0) state = 'game'
   end,
@@ -155,21 +155,21 @@ states.sliding = {
     if self.frame < self.frame_count then
       self.frame += 1
     else
-      order[blank], order[active_cell_id] = order[active_cell_id], order[blank]
+      panel_ids[blank], panel_ids[active_cell_id] = panel_ids[active_cell_id], panel_ids[blank]
       blank, active_cell_id = active_cell_id, blank
       self.frame = 0
-      if (active_cell_id == order[active_cell_id]) sfx(1)
+      if (active_cell_id == panel_ids[active_cell_id]) sfx(1)
       state = 'game'
     end
   end,
   ['draw'] = function (self)
     cls()
     for i, cell in pairs(board) do
-      if (i != active_cell_id and i != blank) render_panel(order[i], cell)
+      if (i != active_cell_id and i != blank) render_panel(panel_ids[i], cell)
     end
 
     local sliding_cell = board[active_cell_id]
-    render_panel(order[active_cell_id], sliding_cell,
+    render_panel(panel_ids[active_cell_id], sliding_cell,
       sliding_cell.width / self.frame_count * self.frame * self.move.vx,
       sliding_cell.height / self.frame_count * self.frame * self.move.vy)
   end,
@@ -188,9 +188,9 @@ state = nil
 function _init()
   board = init_matrix(128 / dim_x, 128 / dim_y)
   panels = init_matrix(128 / dim_x, 128 / dim_y)
-  order = {}
+  panel_ids = {}
   for panel_id = 1, dim_x * dim_y do
-    add(order, panel_id)
+    add(panel_ids, panel_id)
   end
 
   state = 'shuffle'
