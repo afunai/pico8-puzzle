@@ -72,7 +72,7 @@ function render_panel(panel_id, cell, ...)
   print(panel_id, x + 2, y + 2, 0)
 end
 
-function render()
+function render_board()
   cls()
   for i, cell in pairs(board) do
     if (i != blank) render_panel(order[i], cell)
@@ -117,7 +117,7 @@ states.shuffle = {
     if (self.count == 0) state = 'game'
   end,
   ['draw'] = function (self)
-    render()
+    render_board()
   end,
 }
 
@@ -142,7 +142,7 @@ states.game = {
     end
   end,
   ['draw'] = function (self)
-    render()
+    render_board()
     render_cursor()
   end,
 }
