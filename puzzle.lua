@@ -25,16 +25,16 @@ end
 moves = {
   [⬅️] = {
     ['is_possible'] = function(cell_id) return cell_id == blank + 1 and blank % dim_x != 0 end,
-    ['v'] = -1},
+    ['vx'] = -1, ['vy'] = 0},
   [➡️] = {
     ['is_possible'] = function(cell_id) return cell_id == blank - 1 and blank % dim_x != 1 end,
-    ['v'] = 1},
+    ['vx'] = 1, ['vy'] = 0},
   [⬆️] = {
     ['is_possible'] = function(cell_id) return cell_id == blank + dim_x end,
-    ['v'] = -dim_x},
+    ['vx'] = 0, ['vy'] = -1},
   [⬇️] = {
     ['is_possible'] = function(cell_id) return cell_id == blank - dim_x end,
-    ['v'] = dim_x},
+    ['vx'] = 0, ['vy'] = 1},
 }
 
 function possible_moves()
@@ -62,11 +62,14 @@ function is_complete()
   return true
 end
 
-function render_panel(panel_id, cell)
+function render_panel(panel_id, cell, ...)
+  args = {...}
+  local x = cell.x + (args[1] or 0) -- offset_x
+  local y = cell.y + (args[2] or 0) -- offset_y
+
   -- TODO
-  rectfill(cell.x, cell.y,
-    cell.x + cell.width - 1, cell.y + cell.height - 1, 3)
-  print(panel_id, cell.x + 2, cell.y + 2, 0)
+  rectfill(x, y, x + cell.width - 1, y + cell.height - 1, 3)
+  print(panel_id, x + 2, y + 2, 0)
 end
 
 function render()
@@ -130,8 +133,8 @@ states.game = {
     if btnp(❎) then
       for key, move in pairs(moves) do
         if move.is_possible(active_cell_id) then
-          order[blank], order[active_cell_id] = order[active_cell_id], order[blank]
-          blank, active_cell_id = active_cell_id, blank
+          states.sliding.move = move
+          state = 'sliding'
           break
         end
       end
@@ -140,6 +143,33 @@ states.game = {
   ['draw'] = function (self)
     render()
     render_cursor()
+  end,
+}
+
+states.sliding = {
+  ['frame_count'] = 5,
+  ['frame'] = 0,
+  ['move'] = nil,
+  ['update'] = function (self)
+    if self.frame < self.frame_count then
+      self.frame += 1
+    else
+      order[blank], order[active_cell_id] = order[active_cell_id], order[blank]
+      blank, active_cell_id = active_cell_id, blank
+      self.frame = 0
+      state = 'game'
+    end
+  end,
+  ['draw'] = function (self)
+    cls()
+    for i, cell in pairs(board) do
+      if (i != active_cell_id and i != blank) render_panel(order[i], cell)
+    end
+
+    local sliding_cell = board[active_cell_id]
+    render_panel(order[active_cell_id], sliding_cell,
+      sliding_cell.width / self.frame_count * self.frame * self.move.vx,
+      sliding_cell.height / self.frame_count * self.frame * self.move.vy)
   end,
 }
 
