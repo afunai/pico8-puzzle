@@ -133,6 +133,7 @@ states.game = {
     if btnp(❎) then
       for key, move in pairs(moves) do
         if move.is_possible(active_cell_id) then
+          sfx(0)
           states.sliding.move = move
           state = 'sliding'
           break
@@ -157,6 +158,7 @@ states.sliding = {
       order[blank], order[active_cell_id] = order[active_cell_id], order[blank]
       blank, active_cell_id = active_cell_id, blank
       self.frame = 0
+      if (active_cell_id == order[active_cell_id]) sfx(1)
       state = 'game'
     end
   end,
