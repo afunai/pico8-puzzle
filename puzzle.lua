@@ -8,10 +8,10 @@ local active_cell_id = 10
 
 border = 2
 function init_matrix(panel_w, panel_h)
-  local panels = {}
+  local matrix = {}
   for y = 1, dim_y do
     for x = 1, dim_x do
-      add(panels, {
+      add(matrix, {
         ['x'] = (x - 1) * panel_w + border / 2,
         ['y'] = (y - 1) * panel_h + border / 2,
         ['width'] = panel_w - border,
@@ -19,7 +19,7 @@ function init_matrix(panel_w, panel_h)
       })
     end
   end
-  return panels
+  return matrix
 end
 
 moves = {
