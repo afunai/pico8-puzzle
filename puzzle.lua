@@ -4,7 +4,7 @@ local board ={}
 local panels = {}
 local panel_ids = {}
 local blank = dim_x * dim_y
-local active_cell_id = 10
+local active_cell_id = 1
 
 border = 2
 function init_matrix(panel_w, panel_h)
@@ -132,8 +132,8 @@ states.game = {
   ['update'] = function (self)
     if (is_complete()) state = 'complete'
 
-    if (btnp(⬅️) and active_cell_id % 4 != 1) active_cell_id -= 1
-    if (btnp(➡️) and active_cell_id % 4 != 0) active_cell_id += 1
+    if (btnp(⬅️) and active_cell_id % dim_x != 1) active_cell_id -= 1
+    if (btnp(➡️) and active_cell_id % dim_x != 0) active_cell_id += 1
     if (btnp(⬆️) and active_cell_id > dim_x) active_cell_id -= dim_x
     if (btnp(⬇️) and active_cell_id <= dim_x * (dim_y - 1)) active_cell_id += dim_x
 
@@ -177,8 +177,8 @@ states.sliding = {
 
     local sliding_cell = board[active_cell_id]
     render_panel(panel_ids[active_cell_id], sliding_cell,
-      sliding_cell.width / self.frame_count * self.frame * self.move.vx,
-      sliding_cell.height / self.frame_count * self.frame * self.move.vy)
+      sliding_cell.width * self.frame * self.move.vx / self.frame_count,
+      sliding_cell.height * self.frame * self.move.vy / self.frame_count)
   end,
 }
 
@@ -193,8 +193,10 @@ states.complete = {
 state = nil
 
 function _init()
-  board = init_matrix(128 / dim_x, 128 / dim_y)
-  panels = init_matrix(128 / dim_x, 128 / dim_y)
+  local panel_w = flr(128 / dim_x)
+  local panel_h = flr(128 / dim_y)
+  board = init_matrix(panel_w, panel_h)
+  panels = init_matrix(panel_w, panel_h)
   init_panel_imgs(panels)
   panel_ids = {}
   for panel_id = 1, dim_x * dim_y do
