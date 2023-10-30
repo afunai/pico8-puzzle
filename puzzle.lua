@@ -22,6 +22,13 @@ function init_matrix(panel_w, panel_h)
   return matrix
 end
 
+function init_panel_imgs(panels)
+  for panel in all(panels) do
+    panel.img = crop_img('test', panel.x, panel.y,
+      panel.x + panel.width - 1, panel.y + panel.height - 1)
+  end
+end
+
 moves = {
   [⬅️] = {
     ['is_possible'] = function(cell_id) return cell_id == blank + 1 and blank % dim_x != 0 end,
@@ -67,8 +74,8 @@ function render_panel(panel_id, cell, ...)
   local x = cell.x + (args[1] or 0) -- offset_x
   local y = cell.y + (args[2] or 0) -- offset_y
 
-  -- TODO
-  rectfill(x, y, x + cell.width - 1, y + cell.height - 1, 3)
+  rectfill(x, y, x + cell.width - 1, y + cell.height - 1, 12)
+  draw_img(panels[panel_id].img, x, y)
   print(panel_id, x + 2, y + 2, 0)
 end
 
@@ -188,6 +195,7 @@ state = nil
 function _init()
   board = init_matrix(128 / dim_x, 128 / dim_y)
   panels = init_matrix(128 / dim_x, 128 / dim_y)
+  init_panel_imgs(panels)
   panel_ids = {}
   for panel_id = 1, dim_x * dim_y do
     add(panel_ids, panel_id)
