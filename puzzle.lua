@@ -69,18 +69,29 @@ function is_complete()
   return true
 end
 
+function render_background()
+  cls(12)
+end
+
+function render_blank()
+  local blank_cell = board[blank]
+  local x, y = blank_cell.x, blank_cell.y
+  rectfill(x - 1, y - 1, x + blank_cell.width, y + blank_cell.height, 0)
+end
+
 function render_panel(panel_id, cell, ...)
   args = {...}
   local x = cell.x + (args[1] or 0) -- offset_x
   local y = cell.y + (args[2] or 0) -- offset_y
 
-  rectfill(x, y, x + cell.width - 1, y + cell.height - 1, 12)
+  rect(x - 1, y - 1, x + cell.width, y + cell.height, 0)
   draw_img(panels[panel_id].img, x, y)
   print(panel_id, x + 2, y + 2, 0)
 end
 
 function render_board()
-  cls()
+  render_background()
+  render_blank()
   for i, cell in pairs(board) do
     if (i != blank) render_panel(panel_ids[i], cell)
   end
@@ -102,7 +113,9 @@ function render_cursor()
 end
 
 function render_complete()
-  print('you win', 51, 60, 7)
+  render_background()
+  draw_img('test')
+  print('clear!', 52, 3, 7)
 end
 
 --
@@ -171,7 +184,8 @@ states.sliding = {
     end
   end,
   ['draw'] = function (self)
-    cls()
+    render_background()
+    render_blank()
     for i, cell in pairs(board) do
       if (i != active_cell_id and i != blank) render_panel(panel_ids[i], cell)
     end
