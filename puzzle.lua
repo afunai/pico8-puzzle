@@ -143,9 +143,10 @@ states.game = {
           sfx(0)
           states.sliding.move = move
           state = 'sliding'
-          break
+          return
         end
       end
+      sfx(2)
     end
   end,
   ['draw'] = function (self)
