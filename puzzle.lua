@@ -71,6 +71,8 @@ end
 
 function render_background()
   cls(12)
+  states.bg:update()
+  states.bg:draw()
 end
 
 function render_blank()
@@ -202,6 +204,37 @@ states.complete = {
   end,
   ['draw'] = function (self)
     render_complete()
+  end,
+}
+
+states.bg = {
+  ['hearts'] = {},
+  ['update'] = function (self)
+    if count(self.hearts) == 0 then
+        for i = 1, 10 do
+          add(self.hearts,
+            {['x'] = rnd(120),
+            ['y'] = rnd(20) + 120,
+            ['deg'] = rnd(1),
+            ['vd'] = (rnd(2) - 1) / 30})
+        end
+    end
+
+    for h in all(self.hearts) do
+       h.x += cos(h.deg)
+       h.y += sin(h.deg) - 1
+       h.deg += h.vd
+       if (rnd(10) < 1) h.vd = (rnd(2) - 1) / 30
+       if h.y < -10 then
+         h.x = rnd(120)
+         h.y = rnd(20) + 120
+       end
+    end
+  end,
+  ['draw'] = function (self)
+    for h in all(self.hearts) do
+      print("\f8\^p♥", h.x, h.y)
+    end
   end,
 }
 
