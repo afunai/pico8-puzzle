@@ -12,6 +12,7 @@ function init_matrix(panel_w, panel_h)
   for y = 1, dim_y do
     for x = 1, dim_x do
       add(matrix, {
+        ['id'] = (y - 1) * dim_y + x,
         ['x'] = (x - 1) * panel_w + border / 2,
         ['y'] = (y - 1) * panel_h + border / 2,
         ['width'] = panel_w - border,
@@ -87,7 +88,9 @@ function render_panel(panel_id, cell, ...)
   local y = cell.y + (args[2] or 0) -- offset_y
 
   rect(x - 1, y - 1, x + cell.width, y + cell.height, 0)
+  if (panel_id != cell.id) pal({0, 5, 5, 5, 5, 6, 7, 5, 6, 6, 6, 6, 6, 6, 6, 0}, 0)
   draw_img(panels[panel_id].img, x, y)
+  pal()
   print(panel_id, x + 2, y + 2, 0)
 end
 
