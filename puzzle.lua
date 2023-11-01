@@ -211,11 +211,11 @@ states.complete = {
 }
 
 states.bg = {
-  ['hearts'] = {},
+  ['particles'] = {},
   ['update'] = function (self)
-    if count(self.hearts) == 0 then
+    if #self.particles == 0 then
         for i = 1, 10 do
-          add(self.hearts,
+          add(self.particles,
             {['x'] = rnd(120),
             ['y'] = rnd(20) + 120,
             ['deg'] = rnd(1),
@@ -223,20 +223,26 @@ states.bg = {
         end
     end
 
-    for h in all(self.hearts) do
-       h.x += cos(h.deg)
-       h.y += sin(h.deg) - 1
-       h.deg += h.vd
-       if (rnd(10) < 1) h.vd = (rnd(2) - 1) / 30
-       if h.y < -10 then
-         h.x = rnd(120)
-         h.y = rnd(20) + 120
+    local vy = -0.5
+    if (state == 'complete') vy = -2
+
+    for p in all(self.particles) do
+       p.x += cos(p.deg)
+       p.y += sin(p.deg) + vy
+       p.deg += p.vd
+       if (rnd(10) < 1) p.vd = (rnd(2) - 1) / 30
+       if p.y < -10 then
+         p.x = rnd(120)
+         p.y = rnd(20) + 120
        end
     end
   end,
   ['draw'] = function (self)
-    for h in all(self.hearts) do
-      print("\f8\^p♥", h.x, h.y)
+    local char = "\f1\^w\^t?"
+    if (state == 'complete') char = "\f8\^p♥"
+
+    for p in all(self.particles) do
+      print(char, p.x, p.y)
     end
   end,
 }
