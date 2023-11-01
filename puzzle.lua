@@ -139,7 +139,10 @@ states.shuffle = {
   ['update'] = function (self)
     if (self.count % 2 == 0) panel_ids = shuffle(panel_ids)
     self.count-= 1
-    if (self.count == 0) state = 'game'
+    if self.count == 0 then
+      music()
+      state = 'game'
+    end
   end,
   ['draw'] = function (self)
     render_board()
@@ -148,7 +151,11 @@ states.shuffle = {
 
 states.game = {
   ['update'] = function (self)
-    if (is_complete()) state = 'complete'
+    if is_complete() then
+      music(-1)
+      sfx(13)
+      state = 'complete'
+    end
 
     if (btnp(⬅️) and active_cell_id % dim_x != 1) active_cell_id -= 1
     if (btnp(➡️) and active_cell_id % dim_x != 0) active_cell_id += 1
