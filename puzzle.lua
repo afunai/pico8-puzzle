@@ -111,6 +111,7 @@ function render_cursor()
   local cell = board[active_cell_id]
   if moveable then
     if (time() * 2 % 1 > .5) fillp(0b1010010110100101) else fillp(0b0101101001011010)
+    print('❎', cell.x + cell.width / 2 - 4, cell.y + cell.height / 2 - 4 + (time() * 4 % 2))
   end
   rect(cell.x - 1, cell.y - 1,
     cell.x + cell.width, cell.y + cell.height, 7)
