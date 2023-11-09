@@ -24,21 +24,22 @@ end
   draw_img(img, 47, 47, nil, nil, nil, nil,
     function (matrix, plane_index, x, y, dx1, dy1, dx2, dy2)
       clip(0)
-      _draw_plane_rotate(matrix, plane_index, x, y, dx1, dy1, dx2, dy2, cos(deg), sin(deg))
+      _draw_plane_rotate(matrix, plane_index, x, y, dx1, dy1, dx2, dy2, cos(angle), sin(angle))
     end)
 --]]
 
-function prepare_img()
+function prepare_img(cell)
   poke(0x5f55, 0x00) -- draw to sprite region
-  local x, y = 0, 0
-  rectfill(x, y, x + 31, y + 31, 12)
-  draw_img('test', x, y, 0, 0, 31, 31)
+  local sx, sy = 0, 0
+  rectfill(sx, sy, sx + cell.width - 1, sy + cell.height - 1, 12)
+  draw_img('test', sx, sy, cell.x, cell.y,
+    cell.x + cell.width - 1, cell.y + cell.height - 1)
   poke(0x5f55, 0x60) -- restore
 end
 
-function rotate_spr(x, y, size, deg)
-  local c = cos(deg)
-  local s = sin(deg)
+function rotate_spr(x, y, size, angle)
+  local c = cos(angle)
+  local s = sin(angle)
   local b = c ^ 2 + s ^ 2
   local w = sqrt(size ^ 2 * 2)
   for oy = -w, w do
@@ -52,15 +53,21 @@ function rotate_spr(x, y, size, deg)
 end
 
 function _init()
-  prepare_img()
-  deg = 0
+  local last_Cell = {
+    x = 3 * 32 + 1,
+    y = 3 * 32 + 1,
+    width = 32 - 2,
+    height = 32 - 2,
+  }
+  prepare_img(last_Cell)
+  angle = 0
 end
 
 function _update60()
-  deg = (deg + 0.025) % 1
+  angle = (angle + 0.025) % 1
 end
 
 function _draw()
   cls()
-  rotate_spr(64, 64, 16, deg)
+  rotate_spr(64, 64, 16, angle)
 end
