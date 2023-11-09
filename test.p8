@@ -37,37 +37,48 @@ function prepare_img(cell)
   poke(0x5f55, 0x60) -- restore
 end
 
-function rotate_spr(x, y, size, angle)
-  local c = cos(angle)
-  local s = sin(angle)
-  local b = c ^ 2 + s ^ 2
-  local w = sqrt(size ^ 2 * 2)
-  for oy = -w, w do
-    for ox = -w, w do
-      local sx = (c * ox + s * oy) / b + size
-      local sy = (c * oy - s * ox) / b + size
+function rotate_spr(x, y, width, height, angle)
+  local cs = cos(angle)
+  local sn = sin(angle)
+  local s = max(sqrt(width ^ 2 / 2), sqrt(height ^ 2 / 2))
+  for oy = -s, s do
+    for ox = -s, s do
+      local sx = (cs * ox + sn * oy) + width / 2
+      local sy = (cs * oy - sn * ox) + height / 2
       local col = sget(sx, sy)
       if (col > 0) pset(x + ox, y + oy, col)
     end
   end
 end
 
+local last_cell = {
+  x = 3 * 32 + 1,
+  y = 3 * 32 + 1,
+  width = 32 - 2,
+  height = 32 - 2,
+}
+
+cx = 127 - last_cell.width / 2
+cy = 63 - last_cell.height / 2
+radius = 64
+
 function _init()
-  local last_Cell = {
-    x = 3 * 32 + 1,
-    y = 3 * 32 + 1,
-    width = 32 - 2,
-    height = 32 - 2,
-  }
-  prepare_img(last_Cell)
-  angle = 0
+  prepare_img(last_cell)
+  angle1 = 0.25
+  angle2 = 0
 end
 
 function _update60()
-  angle = (angle + 0.025) % 1
+  angle1 += 0.0125
+  if (angle1 > 0.75) then
+    angle1 = 0.75
+  else
+    angle2 = (angle2 + 0.1) % 1
+  end
 end
 
 function _draw()
-  cls()
-  rotate_spr(64, 64, 16, angle)
+  cls(1)
+  rotate_spr(cos(angle1) * radius * 1.8 + cx, sin(angle1) * radius + cy,
+    last_cell.width, last_cell.height, angle2)
 end
