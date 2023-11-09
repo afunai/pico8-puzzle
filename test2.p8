@@ -11,7 +11,8 @@ end
 function symbol(x, y, width, height, ...)
   local args = {...}
   local angle = args[1] or 0
-  local scale = args[2] or 1
+  local scale_x = args[2] or 1
+  local scale_y = args[3] or scale_x
   local cs, sn = cos(angle), sin(angle)
   local cx = x + width / 2 - 1
   local cy = y + height / 2 - 1
@@ -23,22 +24,22 @@ function symbol(x, y, width, height, ...)
       local col = sget(sx, sy)
       if col > 0 then
         line(
-          cs * (x + sx - cx - offset) * scale + sn * (y + sy - cy - offset) * scale + cx,
-          cs * (y + sy - cy - offset) * scale - sn * (x + sx - cx - offset) * scale + cy,
-          cs * (x + sx - cx + offset) * scale + sn * (y + sy - cy - offset) * scale + cx,
-          cs * (y + sy - cy - offset) * scale - sn * (x + sx - cx + offset) * scale + cy,
+          cs * (x + sx - cx - offset) * scale_x + sn * (y + sy - cy - offset) * scale_y + cx,
+          cs * (y + sy - cy - offset) * scale_y - sn * (x + sx - cx - offset) * scale_x + cy,
+          cs * (x + sx - cx + offset) * scale_x + sn * (y + sy - cy - offset) * scale_y + cx,
+          cs * (y + sy - cy - offset) * scale_y - sn * (x + sx - cx + offset) * scale_x + cy,
           col)
         line(
-          cs * (x + sx - cx + offset) * scale + sn * (y + sy - cy + offset) * scale + cx,
-          cs * (y + sy - cy + offset) * scale - sn * (x + sx - cx + offset) * scale + cy,
+          cs * (x + sx - cx + offset) * scale_x + sn * (y + sy - cy + offset) * scale_y + cx,
+          cs * (y + sy - cy + offset) * scale_y - sn * (x + sx - cx + offset) * scale_x + cy,
           col)
         line(
-          cs * (x + sx - cx - offset) * scale + sn * (y + sy - cy + offset) * scale + cx,
-          cs * (y + sy - cy + offset) * scale - sn * (x + sx - cx - offset) * scale + cy,
+          cs * (x + sx - cx - offset) * scale_x + sn * (y + sy - cy + offset) * scale_y + cx,
+          cs * (y + sy - cy + offset) * scale_y - sn * (x + sx - cx - offset) * scale_x + cy,
           col)
         line(
-          cs * (x + sx - cx - offset) * scale + sn * (y + sy - cy - offset) * scale + cx,
-          cs * (y + sy - cy - offset) * scale - sn * (x + sx - cx - offset) * scale + cy,
+          cs * (x + sx - cx - offset) * scale_x + sn * (y + sy - cy - offset) * scale_y + cx,
+          cs * (y + sy - cy - offset) * scale_y - sn * (x + sx - cx - offset) * scale_x + cy,
           col)
       end
     end
@@ -50,14 +51,17 @@ function _init()
   height = 12
   angle = 0
   scale = 1
+  scale2 = 2
 end
 
 function _update60()
   if (time() % 2 > 1) angle = (angle + 0.025) % 1
   scale = cos(time() / 6) * 7
+  scale2 = cos(time() / 2 % 1) * 2
 end
 
 function _draw()
   cls()
   symbol(64 - width / 2, 64 - height / 2, width, height, angle, scale)
+  symbol(105 - width / 2, 20 - height / 2, width, height, 0, scale2, 2)
 end
