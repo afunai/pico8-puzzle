@@ -43,8 +43,8 @@ function rotate_spr(x, y, width, height, angle)
   local s = max(sqrt(width ^ 2 / 2), sqrt(height ^ 2 / 2))
   for oy = -s, s do
     for ox = -s, s do
-      local sx = (cs * ox + sn * oy) + width / 2
-      local sy = (cs * oy - sn * ox) + height / 2
+      local sx = (cs * ox - sn * oy) + width / 2
+      local sy = (cs * oy + sn * ox) + height / 2
       local col = sget(sx, sy)
       if (col > 0) pset(x + ox, y + oy, col)
     end
