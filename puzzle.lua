@@ -14,7 +14,7 @@ function init_matrix(panel_w, panel_h)
   for y = 1, dim_y do
     for x = 1, dim_x do
       add(matrix, {
-        ['id'] = (y - 1) * dim_y + x,
+        ['id'] = (y - 1) * dim_x + x,
         ['x'] = (x - 1) * panel_w + border / 2 + offset_x,
         ['y'] = (y - 1) * panel_h + border / 2 + offset_y,
         ['width'] = panel_w - border,
