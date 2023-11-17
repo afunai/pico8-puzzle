@@ -28,24 +28,29 @@ end
     end)
 --]]
 
-function prepare_img(cell)
+function prepare_cell(img_name, bg_color, cell, x, y)
   poke(0x5f55, 0x00) -- draw to sprite region
-  local sx, sy = 0, 0
-  rectfill(sx, sy, sx + cell.width - 1, sy + cell.height - 1, 12)
-  draw_img('test', sx, sy, cell.x, cell.y,
+  rectfill(x, y, x + cell.width - 1, y + cell.height - 1, bg_color)
+  draw_img(img_name, x, y, cell.x, cell.y,
     cell.x + cell.width - 1, cell.y + cell.height - 1)
   poke(0x5f55, 0x60) -- restore
+  return {
+    x = x,
+    y = y,
+    w = cell.width,
+    h = cell.height,
+  }
 end
 
-function rotate_spr(x, y, width, height, angle)
+function rotate_spr(x, y, c, angle)
   local cs = cos(angle)
   local sn = sin(angle)
-  local s = max(sqrt(width ^ 2 / 2), sqrt(height ^ 2 / 2))
+  local s = max(sqrt(c.w ^ 2 / 2), sqrt(c.h ^ 2 / 2))
   for oy = -s, s do
     for ox = -s, s do
-      local sx = (cs * ox - sn * oy) + width / 2
-      local sy = (cs * oy + sn * ox) + height / 2
-      local col = sget(sx, sy)
+      local sx = (cs * ox - sn * oy) + c.w / 2
+      local sy = (cs * oy + sn * ox) + c.h / 2
+      local col = sget(sx + c.x, sy + c.y)
       if (col > 0) pset(x + ox, y + oy, col)
     end
   end
@@ -63,7 +68,7 @@ cy = 63 - last_cell.height / 2
 radius = 64
 
 function _init()
-  prepare_img(last_cell)
+  c = prepare_cell('test', 12, last_cell, 64, 48)
   angle1 = 0.25
   angle2 = 0
 end
@@ -79,6 +84,5 @@ end
 
 function _draw()
   cls(1)
-  rotate_spr(cos(angle1) * radius * 1.8 + cx, sin(angle1) * radius + cy,
-    last_cell.width, last_cell.height, angle2)
+  rotate_spr(cos(angle1) * radius * 1.8 + cx, sin(angle1) * radius + cy, c, angle2)
 end
