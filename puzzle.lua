@@ -8,13 +8,15 @@ local active_cell_id = 1
 
 border = 2
 function init_matrix(panel_w, panel_h)
+  local offset_x = flr((128 - dim_x * panel_w) / 2)
+  local offset_y = flr((128 - dim_y * panel_h) / 2)
   local matrix = {}
   for y = 1, dim_y do
     for x = 1, dim_x do
       add(matrix, {
         ['id'] = (y - 1) * dim_y + x,
-        ['x'] = (x - 1) * panel_w + border / 2,
-        ['y'] = (y - 1) * panel_h + border / 2,
+        ['x'] = (x - 1) * panel_w + border / 2 + offset_x,
+        ['y'] = (y - 1) * panel_h + border / 2 + offset_y,
         ['width'] = panel_w - border,
         ['height'] = panel_h - border,
       })
@@ -71,7 +73,18 @@ function is_complete()
 end
 
 function render_background()
-  cls(12)
+  if state == 'complete' then
+    cls(12)
+  else
+    cls()
+    rectfill(
+      board[1].x,
+      board[1].y,
+      board[#board].x + board[#board].width,
+      board[#board].y + board[#board].height,
+      12
+    )
+  end
   states.bg:update()
   states.bg:draw()
 end
