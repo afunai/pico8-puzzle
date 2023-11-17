@@ -32,6 +32,34 @@ function init_panel_imgs(panels)
   end
 end
 
+function prepare_cell(img_name, bg_color, cell, x, y)
+  poke(0x5f55, 0x00) -- draw to sprite region
+  rectfill(x, y, x + cell.width - 1, y + cell.height - 1, bg_color)
+  draw_img(img_name, x, y, cell.x, cell.y,
+    cell.x + cell.width - 1, cell.y + cell.height - 1)
+  poke(0x5f55, 0x60) -- restore
+  return {
+    x = x,
+    y = y,
+    w = cell.width,
+    h = cell.height,
+  }
+end
+
+function rotate_cell(c, x, y, angle)
+  local cs = cos(angle)
+  local sn = sin(angle)
+  local s = max(sqrt(c.w ^ 2 / 2), sqrt(c.h ^ 2 / 2))
+  for oy = -s, s do
+    for ox = -s, s do
+      local sx = (cs * ox - sn * oy) + c.w / 2
+      local sy = (cs * oy + sn * ox) + c.h / 2
+      local col = sget(sx + c.x, sy + c.y)
+      if (col > 0) pset(x + ox, y + oy, col)
+    end
+  end
+end
+
 moves = {
   [⬅️] = {
     ['is_possible'] = function(cell_id) return cell_id == blank + 1 and blank % dim_x != 0 end,
@@ -167,8 +195,7 @@ states.game = {
   ['update'] = function (self)
     if is_complete() then
       music(-1)
-      sfx(13)
-      state = 'complete'
+      state = 'last_cell'
     end
 
     if (btnp(⬅️) and active_cell_id % dim_x != 1) active_cell_id -= 1
@@ -220,6 +247,46 @@ states.sliding = {
     render_panel(panel_ids[active_cell_id], sliding_cell,
       sliding_cell.width * self.frame * self.move.vx / self.frame_count,
       sliding_cell.height * self.frame * self.move.vy / self.frame_count)
+  end,
+}
+
+states.last_cell = {
+  cell = nil,
+  cx = 0,
+  cy = 0,
+  radius = 64,
+  angle1 = 0,
+  angle2 = 0,
+  update = function (self)
+    if self.cell == nil then
+      local last_cell = panels[#panels]
+      self.cell = prepare_cell('test', 12, last_cell, 64, 0)
+      self.cx = 127 - last_cell.width / 2
+      self.cy = 63 - last_cell.height / 2
+      radius = 64
+      self.angle1 = 0.25
+      self.angle2 = 0
+    else
+      self.angle1 += 0.00625
+      if (self.angle1 > 0.75) then
+        self.cell = nil
+        sfx(13)
+        state = 'complete'
+      else
+        self.angle2 = (self.angle2 + 0.05) % 1
+      end
+    end
+  end,
+  draw = function (self)
+    render_board()
+    if self.cell != nil then
+      rotate_cell(
+        self.cell,
+        cos(self.angle1) * self.radius * 1.8 + self.cx,
+        sin(self.angle1) * self.radius + self.cy,
+        self.angle2
+      )
+    end
   end,
 }
 
