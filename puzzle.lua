@@ -195,6 +195,7 @@ states.game = {
   ['update'] = function (self)
     if is_complete() then
       music(-1)
+      sfx(3)
       state = 'last_cell'
     end
 
@@ -270,6 +271,8 @@ states.last_cell = {
       self.angle1 += 0.00625
       if (self.angle1 > 0.75) then
         self.cell = nil
+        sfx(3, -2)
+        sfx(0)
         sfx(13)
         state = 'complete'
       else
