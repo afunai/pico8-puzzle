@@ -281,7 +281,10 @@ states.init = {
 states.shuffle = {
   count = nil,
   update = function (self)
-    if (self.count == nil) self.count = stage.dim_x * stage.dim_y * 8 * 2
+    if self.count == nil then
+      self.count = stage.dim_x * stage.dim_y * 8 * 2
+      music(-1)
+    end
 
     if (self.count % 2 == 0) then
       sfx(4)
@@ -421,7 +424,7 @@ states.complete_logo = {
       render_board()
       render_panel(#panels, board[#board])
       for i = 1, 30 do flip() end
-      music(4)
+      music(7)
       self.t = prepare_text('\f8\|gs\|ht\|ha\|hg\|he\n\|cc\|hl\|he\|ha\|hr', 32, 0)
       self.frame = 0
       self.scale = 15
