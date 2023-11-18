@@ -128,8 +128,10 @@ function render_background()
       stage.bg_color
     )
   end
-  states.bg:update()
-  states.bg:draw()
+  if state == 'game' or state == 'complete' then
+    states.bg:update()
+    states.bg:draw()
+  end
 end
 
 function render_blank()
