@@ -75,11 +75,15 @@ moves = {
     vx = 0, vy = 1},
 }
 
+local prev_cell_id = nil
+
 function possible_moves()
   local possible_moves = {}
   for cell_id, panel_id in pairs(panel_ids) do
     for key, move in pairs(moves) do
-      if (move.is_possible(cell_id)) add(possible_moves, cell_id)
+      if move.is_possible(cell_id) and cell_id != prev_cell_id then
+        add(possible_moves, cell_id)
+      end
     end
   end
   return possible_moves
@@ -90,6 +94,7 @@ function shuffle(panel_ids)
   local cell_id = possible_moves[flr(rnd(#possible_moves)) + 1]
   panel_ids[blank], panel_ids[cell_id] = panel_ids[cell_id], panel_ids[blank]
   blank = cell_id
+  prev_cell_id = cell_id
   return panel_ids
 end
 
