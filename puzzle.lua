@@ -360,12 +360,7 @@ states.sliding = {
 }
 
 states.last_cell = {
-  cell = nil,
-  cx = 0,
-  cy = 0,
   radius = 64,
-  angle1 = 0,
-  angle2 = 0,
   update = function (self)
     if self.cell == nil then
       local last_cell = panels[#panels]
