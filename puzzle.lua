@@ -1,20 +1,30 @@
-local dim_x, dim_y = 4, 4
+local stages = {
+  {
+    dim_x = 4,
+    dim_y = 4,
+    img_name = 'test',
+    bg_color = 12,
+    music = 0,
+  },
+}
+local stage_id = 1
+local stage = stages[stage_id]
 
 local board ={}
 local panels = {}
 local panel_ids = {}
-local blank = dim_x * dim_y
+local blank = stage.dim_x * stage.dim_y
 local active_cell_id = 1
 
 border = 2
 function init_matrix(panel_w, panel_h)
-  local offset_x = flr((128 - dim_x * panel_w) / 2)
-  local offset_y = flr((128 - dim_y * panel_h) / 2)
+  local offset_x = flr((128 - stage.dim_x * panel_w) / 2)
+  local offset_y = flr((128 - stage.dim_y * panel_h) / 2)
   local matrix = {}
-  for y = 1, dim_y do
-    for x = 1, dim_x do
+  for y = 1, stage.dim_y do
+    for x = 1, stage.dim_x do
       add(matrix, {
-        id = (y - 1) * dim_x + x,
+        id = (y - 1) * stage.dim_x + x,
         x = (x - 1) * panel_w + border / 2 + offset_x,
         y = (y - 1) * panel_h + border / 2 + offset_y,
         width = panel_w - border,
@@ -25,9 +35,9 @@ function init_matrix(panel_w, panel_h)
   return matrix
 end
 
-function init_panel_imgs(panels)
+function init_panel_imgs(panels, img_name)
   for panel in all(panels) do
-    panel.img = crop_img('test', panel.x, panel.y,
+    panel.img = crop_img(img_name, panel.x, panel.y,
       panel.x + panel.width - 1, panel.y + panel.height - 1)
   end
 end
@@ -62,16 +72,16 @@ end
 
 moves = {
   ⬅️ = {
-    is_possible = function(cell_id) return cell_id == blank + 1 and blank % dim_x != 0 end,
+    is_possible = function(cell_id) return cell_id == blank + 1 and blank % stage.dim_x != 0 end,
     vx = -1, vy = 0},
   ➡️ = {
-    is_possible = function(cell_id) return cell_id == blank - 1 and blank % dim_x != 1 end,
+    is_possible = function(cell_id) return cell_id == blank - 1 and blank % stage.dim_x != 1 end,
     vx = 1, vy = 0},
   ⬆️ = {
-    is_possible = function(cell_id) return cell_id == blank + dim_x end,
+    is_possible = function(cell_id) return cell_id == blank + stage.dim_x end,
     vx = 0, vy = -1},
   ⬇️ = {
-    is_possible = function(cell_id) return cell_id == blank - dim_x end,
+    is_possible = function(cell_id) return cell_id == blank - stage.dim_x end,
     vx = 0, vy = 1},
 }
 
@@ -107,7 +117,7 @@ end
 
 function render_background()
   if state == 'complete' then
-    cls(12)
+    cls(stage.bg_color)
   else
     cls()
     rectfill(
@@ -115,7 +125,7 @@ function render_background()
       board[1].y,
       board[#board].x + board[#board].width,
       board[#board].y + board[#board].height,
-      12
+      stage.bg_color
     )
   end
   states.bg:update()
@@ -166,7 +176,7 @@ end
 
 function render_complete()
   render_background()
-  draw_img('test')
+  draw_img(stage.img_name)
   print('clear!', 52, 3, 7)
 end
 
@@ -182,12 +192,12 @@ states.wait = {
 }
 
 states.shuffle = {
-  count = dim_x * dim_y * 8 * 2,
+  count = stage.dim_x * stage.dim_y * 8 * 2,
   update = function (self)
     if (self.count % 2 == 0) panel_ids = shuffle(panel_ids)
     self.count-= 1
     if self.count == 0 then
-      music()
+      music(stage.music)
       state = 'game'
     end
   end,
@@ -204,10 +214,10 @@ states.game = {
       state = 'last_cell'
     end
 
-    if (btnp(⬅️) and active_cell_id % dim_x != 1) active_cell_id -= 1
-    if (btnp(➡️) and active_cell_id % dim_x != 0) active_cell_id += 1
-    if (btnp(⬆️) and active_cell_id > dim_x) active_cell_id -= dim_x
-    if (btnp(⬇️) and active_cell_id <= dim_x * (dim_y - 1)) active_cell_id += dim_x
+    if (btnp(⬅️) and active_cell_id % stage.dim_x != 1) active_cell_id -= 1
+    if (btnp(➡️) and active_cell_id % stage.dim_x != 0) active_cell_id += 1
+    if (btnp(⬆️) and active_cell_id > stage.dim_x) active_cell_id -= stage.dim_x
+    if (btnp(⬇️) and active_cell_id <= stage.dim_x * (stage.dim_y - 1)) active_cell_id += stage.dim_x
 
     if btnp(❎) then
       for key, move in pairs(moves) do
@@ -266,7 +276,7 @@ states.last_cell = {
   update = function (self)
     if self.cell == nil then
       local last_cell = panels[#panels]
-      self.cell = prepare_cell('test', 12, last_cell, 64, 0)
+      self.cell = prepare_cell(stage.img_name, stage.bg_color, last_cell, 64, 0)
       self.cx = 127 - last_cell.width / 2
       self.cy = 63 - last_cell.height / 2
       radius = 64
@@ -346,13 +356,13 @@ states.bg = {
 state = nil
 
 function _init()
-  local panel_w = flr(128 / dim_x)
-  local panel_h = flr(128 / dim_y)
+  local panel_w = flr(128 / stage.dim_x)
+  local panel_h = flr(128 / stage.dim_y)
   board = init_matrix(panel_w, panel_h)
   panels = init_matrix(panel_w, panel_h)
-  init_panel_imgs(panels)
+  init_panel_imgs(panels, stage.img_name)
   panel_ids = {}
-  for panel_id = 1, dim_x * dim_y do
+  for panel_id = 1, stage.dim_x * stage.dim_y do
     add(panel_ids, panel_id)
   end
 
