@@ -1,5 +1,19 @@
 local stages = {
   {
+    dim_x = 2,
+    dim_y = 2,
+    img_name = 'test',
+    bg_color = 8,
+    music = 0,
+  },
+  {
+    dim_x = 3,
+    dim_y = 3,
+    img_name = 'test',
+    bg_color = 9,
+    music = 5,
+  },
+  {
     dim_x = 4,
     dim_y = 4,
     img_name = 'test',
@@ -8,12 +22,12 @@ local stages = {
   },
 }
 local stage_id = 1
-local stage = stages[stage_id]
+local stage = stages[1]
 
-local board ={}
+local board = {}
 local panels = {}
 local panel_ids = {}
-local blank = stage.dim_x * stage.dim_y
+local blank = 1
 local active_cell_id = 1
 
 border = 2
@@ -44,6 +58,7 @@ end
 
 function prepare_cell(img_name, bg_color, cell, x, y)
   poke(0x5f55, 0x00) -- draw to sprite region
+  cls() -- TODO
   rectfill(x, y, x + cell.width - 1, y + cell.height - 1, bg_color)
   draw_img(img_name, x, y, cell.x, cell.y,
     cell.x + cell.width - 1, cell.y + cell.height - 1)
@@ -179,26 +194,47 @@ end
 function render_complete()
   render_background()
   draw_img(stage.img_name)
-  print('clear!', 52, 3, 7)
+  print('❎', 118, 119 + (time() * 4 % 2))
 end
 
 --
 
 states = {}
 
-states.wait = {
+states.init = {
   update = function (self)
+    stage = stages[stage_id]
+    board = {}
+    panels = {}
+    panel_ids = {}
+    blank = stage.dim_x * stage.dim_y
+    active_cell_id = 1
+
+    local panel_w = flr(128 / stage.dim_x)
+    local panel_h = flr(128 / stage.dim_y)
+    board = init_matrix(panel_w, panel_h)
+    panels = init_matrix(panel_w, panel_h)
+    init_panel_imgs(panels, stage.img_name)
+    panel_ids = {}
+    for panel_id = 1, stage.dim_x * stage.dim_y do
+      add(panel_ids, panel_id)
+    end
+
+    state = 'shuffle'
   end,
   draw = function (self)
   end,
 }
 
 states.shuffle = {
-  count = stage.dim_x * stage.dim_y * 8 * 2,
+  count = nil,
   update = function (self)
+    if (self.count == nil) self.count = stage.dim_x * stage.dim_y * 8 * 2
+
     if (self.count % 2 == 0) panel_ids = shuffle(panel_ids)
     self.count-= 1
     if self.count == 0 then
+      self.count = nil
       music(stage.music)
       state = 'game'
     end
@@ -312,6 +348,11 @@ states.last_cell = {
 
 states.complete = {
   update = function (self)
+    if btnp(❎) then
+      stage_id += 1
+      if (stage_id > #stages) stage_id = 1
+      state = 'init'
+    end
   end,
   draw = function (self)
     render_complete()
@@ -355,20 +396,8 @@ states.bg = {
   end,
 }
 
-state = nil
-
 function _init()
-  local panel_w = flr(128 / stage.dim_x)
-  local panel_h = flr(128 / stage.dim_y)
-  board = init_matrix(panel_w, panel_h)
-  panels = init_matrix(panel_w, panel_h)
-  init_panel_imgs(panels, stage.img_name)
-  panel_ids = {}
-  for panel_id = 1, stage.dim_x * stage.dim_y do
-    add(panel_ids, panel_id)
-  end
-
-  state = 'shuffle'
+  state = 'init'
 end
 
 function _update60()
