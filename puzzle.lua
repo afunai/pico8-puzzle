@@ -14,11 +14,11 @@ function init_matrix(panel_w, panel_h)
   for y = 1, dim_y do
     for x = 1, dim_x do
       add(matrix, {
-        ['id'] = (y - 1) * dim_x + x,
-        ['x'] = (x - 1) * panel_w + border / 2 + offset_x,
-        ['y'] = (y - 1) * panel_h + border / 2 + offset_y,
-        ['width'] = panel_w - border,
-        ['height'] = panel_h - border,
+        id = (y - 1) * dim_x + x,
+        x = (x - 1) * panel_w + border / 2 + offset_x,
+        y = (y - 1) * panel_h + border / 2 + offset_y,
+        width = panel_w - border,
+        height = panel_h - border,
       })
     end
   end
@@ -61,18 +61,18 @@ function rotate_cell(c, x, y, angle)
 end
 
 moves = {
-  [⬅️] = {
-    ['is_possible'] = function(cell_id) return cell_id == blank + 1 and blank % dim_x != 0 end,
-    ['vx'] = -1, ['vy'] = 0},
-  [➡️] = {
-    ['is_possible'] = function(cell_id) return cell_id == blank - 1 and blank % dim_x != 1 end,
-    ['vx'] = 1, ['vy'] = 0},
-  [⬆️] = {
-    ['is_possible'] = function(cell_id) return cell_id == blank + dim_x end,
-    ['vx'] = 0, ['vy'] = -1},
-  [⬇️] = {
-    ['is_possible'] = function(cell_id) return cell_id == blank - dim_x end,
-    ['vx'] = 0, ['vy'] = 1},
+  ⬅️ = {
+    is_possible = function(cell_id) return cell_id == blank + 1 and blank % dim_x != 0 end,
+    vx = -1, vy = 0},
+  ➡️ = {
+    is_possible = function(cell_id) return cell_id == blank - 1 and blank % dim_x != 1 end,
+    vx = 1, vy = 0},
+  ⬆️ = {
+    is_possible = function(cell_id) return cell_id == blank + dim_x end,
+    vx = 0, vy = -1},
+  ⬇️ = {
+    is_possible = function(cell_id) return cell_id == blank - dim_x end,
+    vx = 0, vy = 1},
 }
 
 function possible_moves()
@@ -170,15 +170,15 @@ end
 states = {}
 
 states.wait = {
-  ['update'] = function (self)
+  update = function (self)
   end,
-  ['draw'] = function (self)
+  draw = function (self)
   end,
 }
 
 states.shuffle = {
-  ['count'] = dim_x * dim_y * 8 * 2,
-  ['update'] = function (self)
+  count = dim_x * dim_y * 8 * 2,
+  update = function (self)
     if (self.count % 2 == 0) panel_ids = shuffle(panel_ids)
     self.count-= 1
     if self.count == 0 then
@@ -186,13 +186,13 @@ states.shuffle = {
       state = 'game'
     end
   end,
-  ['draw'] = function (self)
+  draw = function (self)
     render_board()
   end,
 }
 
 states.game = {
-  ['update'] = function (self)
+  update = function (self)
     if is_complete() then
       music(-1)
       sfx(3)
@@ -216,17 +216,17 @@ states.game = {
       sfx(2)
     end
   end,
-  ['draw'] = function (self)
+  draw = function (self)
     render_board()
     render_cursor()
   end,
 }
 
 states.sliding = {
-  ['frame_count'] = 5,
-  ['frame'] = 0,
-  ['move'] = nil,
-  ['update'] = function (self)
+  frame_count = 5,
+  frame = 0,
+  move = nil,
+  update = function (self)
     if self.frame < self.frame_count then
       self.frame += 1
     else
@@ -237,7 +237,7 @@ states.sliding = {
       state = 'game'
     end
   end,
-  ['draw'] = function (self)
+  draw = function (self)
     render_background()
     render_blank()
     for i, cell in pairs(board) do
@@ -294,23 +294,23 @@ states.last_cell = {
 }
 
 states.complete = {
-  ['update'] = function (self)
+  update = function (self)
   end,
-  ['draw'] = function (self)
+  draw = function (self)
     render_complete()
   end,
 }
 
 states.bg = {
-  ['particles'] = {},
-  ['update'] = function (self)
+  particles = {},
+  update = function (self)
     if #self.particles == 0 then
         for i = 1, 10 do
           add(self.particles,
-            {['x'] = rnd(120),
-            ['y'] = rnd(20) + 120,
-            ['deg'] = rnd(1),
-            ['vd'] = (rnd(2) - 1) / 30})
+            {x = rnd(120),
+            y = rnd(20) + 120,
+            deg = rnd(1),
+            vd = (rnd(2) - 1) / 30})
         end
     end
 
@@ -328,7 +328,7 @@ states.bg = {
        end
     end
   end,
-  ['draw'] = function (self)
+  draw = function (self)
     local char = "\f1\^w\^t?"
     if (state == 'complete') char = "\f8\^p♥"
 
