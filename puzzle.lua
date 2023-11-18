@@ -85,6 +85,58 @@ function rotate_cell(c, x, y, angle)
   end
 end
 
+function prepare_text(text, x, y)
+  poke(0x5f55, 0x00) -- draw to sprite region
+  local width = print(text, x, y)
+  poke(0x5f55, 0x60) -- restore hardware state
+  return {
+    x = x,
+    y = y,
+    w = width - x,
+    h = peek(0x5f27) - y,
+  }
+end
+
+function symbol(x, y, t, ...)
+  local args = {...}
+  local scale_x = args[1] or 1
+  local scale_y = args[2] or scale_x
+  local cx = x + t.w / 2 - 1
+  local cy = y + t.h / 2 - 1
+
+  local offset = 0.3
+
+  for sy = 0, (t.h - 1) do
+    for sx = 0, (t.w - 1) do
+      local col = sget(sx + t.x, sy + t.y)
+      if col > 0 then
+        rectfill(
+          (x + sx - cx - offset) * scale_x + cx - sgn(scale_x),
+          (y + sy - cy - offset) * scale_y + cy - sgn(scale_y),
+          (x + sx - cx + offset) * scale_x + cx + sgn(scale_x),
+          (y + sy - cy + offset) * scale_y + cy + sgn(scale_y),
+          7)
+      end
+    end
+  end
+
+  for sy = 0, (t.h - 1) do
+    for sx = 0, (t.w - 1) do
+      local col = sget(sx + t.x, sy + t.y)
+      if col > 0 then
+        rectfill(
+          (x + sx - cx - offset) * scale_x + cx,
+          (y + sy - cy - offset) * scale_y + cy,
+          (x + sx - cx + offset) * scale_x + cx,
+          (y + sy - cy + offset) * scale_y + cy,
+          col)
+      end
+    end
+  end
+end
+
+--
+
 moves = {
   ⬅️ = {
     is_possible = function(cell_id) return cell_id == blank + 1 and blank % stage.dim_x != 0 end,
@@ -330,7 +382,7 @@ states.last_cell = {
         sfx(3, -2)
         sfx(0)
         music(4)
-        state = 'complete'
+        state = 'complete_logo'
       else
         self.angle2 = (self.angle2 + 0.05) % 1
       end
@@ -345,6 +397,61 @@ states.last_cell = {
         sin(self.angle1) * self.radius + self.cy,
         self.angle2
       )
+    end
+  end,
+}
+
+shades = {
+  0b1111111111111011,
+  0b1111011111111101,
+  0b1111111011111010,
+  0b1111010111110101,
+  0b1111101001111010,
+  0b1110010111100101,
+  0b0111101001011010,
+  0b1010010110100101,
+
+  0b0101101001001010,
+  0b1010010100000101,
+  0b0001101000001010,
+  0b0000010100000101,
+  0b0000101000000010,
+  0b0000010000000100,
+  0b0000001000000000,
+  0b0000000000000000,
+}
+
+states.complete_logo = {
+  update = function (self)
+    if self.t == nil then
+      self.t = prepare_text('\f8\|gs\|ht\|ha\|hg\|he\n\|cc\|hl\|he\|ha\|hr', 32, 0)
+      self.frame = 0
+      self.scale = 15
+    else
+      if self.frame > 0.25 and self.scale >= 4 then
+        self.scale = 5
+        self.frame += 5
+        if self.frame > 500 then
+          self.t = nil
+          state = 'complete'
+        end
+      else
+        self.frame += 0.01
+        self.scale = cos(self.frame) * 15
+      end
+    end
+  end,
+  draw = function (self)
+    render_board()
+    render_panel(#panels, board[#board])
+    if self.frame != nil and self.frame > 1 then
+      fillp(shades[min(flr(self.frame / 5) + 1, 16)] + 0b.1)
+      rectfill(0, 0, 127, 127, 0)
+      fillp()
+    end
+    if self.t != nil then
+      symbol(65 - self.t.w / 2, 65 - self.t.h / 2,
+        self.t, cos(self.frame * 5) * self.scale, abs(self.scale))
     end
   end,
 }
