@@ -376,7 +376,6 @@ states.last_cell = {
         self.cell = nil
         sfx(3, -2)
         sfx(0)
-        music(4)
         state = 'complete_logo'
       else
         self.angle2 = (self.angle2 + 0.05) % 1
@@ -419,6 +418,10 @@ shades = {
 states.complete_logo = {
   update = function (self)
     if self.t == nil then
+      render_board()
+      render_panel(#panels, board[#board])
+      for i = 1, 30 do flip() end
+      music(4)
       self.t = prepare_text('\f8\|gs\|ht\|ha\|hg\|he\n\|cc\|hl\|he\|ha\|hr', 32, 0)
       self.frame = 0
       self.scale = 15
