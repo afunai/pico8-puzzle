@@ -273,7 +273,7 @@ states.last_cell = {
         self.cell = nil
         sfx(3, -2)
         sfx(0)
-        sfx(13)
+        music(4)
         state = 'complete'
       else
         self.angle2 = (self.angle2 + 0.05) % 1
