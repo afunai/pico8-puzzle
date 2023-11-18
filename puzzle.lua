@@ -87,6 +87,7 @@ end
 
 function prepare_text(text, x, y)
   poke(0x5f55, 0x00) -- draw to sprite region
+  cls() -- TODO
   local width = print(text, x, y)
   poke(0x5f55, 0x60) -- restore hardware state
   return {
