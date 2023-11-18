@@ -231,7 +231,10 @@ states.shuffle = {
   update = function (self)
     if (self.count == nil) self.count = stage.dim_x * stage.dim_y * 8 * 2
 
-    if (self.count % 2 == 0) panel_ids = shuffle(panel_ids)
+    if (self.count % 2 == 0) then
+      sfx(4)
+      panel_ids = shuffle(panel_ids)
+    end
     self.count-= 1
     if self.count == 0 then
       self.count = nil
