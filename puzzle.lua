@@ -459,7 +459,14 @@ states.complete_logo = {
 
 states.complete = {
   update = function (self)
+    if self.frame == nil then
+      self.frame = 16
+    elseif self.frame > 0 then
+      self.frame -= 0.3
+    end
+
     if btnp(❎) then
+      self.frame = nil
       stage_id += 1
       if (stage_id > #stages) stage_id = 1
       state = 'init'
@@ -467,6 +474,11 @@ states.complete = {
   end,
   draw = function (self)
     render_complete()
+    if self.frame != nil and self.frame > 0 then
+      fillp(shades[ceil(self.frame)] + 0b.1)
+      rectfill(0, 0, 127, 127, 0)
+      fillp()
+    end
   end,
 }
 
