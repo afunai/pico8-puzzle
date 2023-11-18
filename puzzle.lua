@@ -284,6 +284,7 @@ states.shuffle = {
   update = function (self)
     if self.count == nil then
       self.count = stage.dim_x * stage.dim_y * 8 * 2
+      self.t = prepare_text('\f1stage '..stage_id, 32, 0)
       music(-1)
     end
 
@@ -300,6 +301,10 @@ states.shuffle = {
   end,
   draw = function (self)
     render_board()
+    if self.t != nil then
+      symbol(65 - self.t.w / 2, 65 - self.t.h / 2 + cos(time() * 1.5) * 5,
+        self.t, 3, 3)
+    end
   end,
 }
 
