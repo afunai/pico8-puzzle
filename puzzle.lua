@@ -49,8 +49,8 @@ function init_matrix(panel_w, panel_h)
   return matrix
 end
 
-function init_panel_imgs(panels, img_name)
-  for panel in all(panels) do
+function init_panel_imgs(blank_panels, img_name)
+  for panel in all(blank_panels) do
     panel.img = Pen.crop(img_name, panel.x, panel.y,
       panel.x + panel.width - 1, panel.y + panel.height - 1)
   end
@@ -155,10 +155,10 @@ moves = {
 
 local prev_cell_id = nil
 
-function possible_moves()
+function get_possible_moves()
   local possible_moves = {}
-  for cell_id, panel_id in pairs(panel_ids) do
-    for key, move in pairs(moves) do
+  for cell_id, _ in pairs(panel_ids) do
+    for _, move in pairs(moves) do
       if move.is_possible(cell_id) and cell_id != prev_cell_id then
         add(possible_moves, cell_id)
       end
@@ -167,13 +167,14 @@ function possible_moves()
   return possible_moves
 end
 
-function shuffle(panel_ids)
-  local possible_moves = possible_moves()
+function shuffle(current_panel_ids)
+  local possible_moves = get_possible_moves()
   local cell_id = possible_moves[flr(rnd(#possible_moves)) + 1]
-  panel_ids[blank], panel_ids[cell_id] = panel_ids[cell_id], panel_ids[blank]
+  current_panel_ids[blank], current_panel_ids[cell_id] =
+    current_panel_ids[cell_id], current_panel_ids[blank]
   blank = cell_id
   prev_cell_id = cell_id
-  return panel_ids
+  return current_panel_ids
 end
 
 function is_complete()
@@ -209,7 +210,7 @@ function render_blank()
 end
 
 function render_panel(panel_id, cell, ...)
-  args = {...}
+  local args = {...}
   local x = cell.x + (args[1] or 0) -- offset_x
   local y = cell.y + (args[2] or 0) -- offset_y
 
@@ -230,7 +231,7 @@ end
 
 function render_cursor()
   local moveable = false
-  for key, move in pairs(moves) do
+  for _, move in pairs(moves) do
     if (move.is_possible(active_cell_id)) moveable = true
   end
 
@@ -255,7 +256,7 @@ end
 states = {}
 
 states.init = {
-  update = function (self)
+  update = function (_)
     stage = stages[stage_id]
     board = {}
     panels = {}
@@ -275,7 +276,7 @@ states.init = {
 
     state = 'shuffle'
   end,
-  draw = function (self)
+  draw = function (_)
   end,
 }
 
@@ -309,7 +310,7 @@ states.shuffle = {
 }
 
 states.game = {
-  update = function (self)
+  update = function (_)
     if is_complete() then
       music(-1)
       sfx(3)
@@ -322,7 +323,7 @@ states.game = {
     if (btnp(⬇️) and active_cell_id <= stage.dim_x * (stage.dim_y - 1)) active_cell_id += stage.dim_x
 
     if btnp(❎) then
-      for key, move in pairs(moves) do
+      for _, move in pairs(moves) do
         if move.is_possible(active_cell_id) then
           sfx(0)
           states.sliding.move = move
@@ -333,7 +334,7 @@ states.game = {
       sfx(2)
     end
   end,
-  draw = function (self)
+  draw = function (_)
     render_board()
     render_cursor()
   end,
@@ -376,7 +377,6 @@ states.last_cell = {
       self.cell = prepare_cell(stage.img_name, stage.bg_color, last_cell, 64, 0)
       self.cx = 127 - last_cell.width / 2
       self.cy = 63 - last_cell.height / 2
-      radius = 64
       self.angle1 = 0.25
       self.angle2 = 0
     else
@@ -429,7 +429,7 @@ states.complete_logo = {
     if self.t == nil then
       render_board()
       render_panel(#panels, board[#board])
-      for i = 1, 30 do flip() end
+      for _ = 1, 30 do flip() end
       music(7)
       self.t = prepare_text('\f8\|gs\|ht\|ha\|hg\|he\n\|cc\|hl\|he\|ha\|hr', 32, 0)
       self.frame = 0
@@ -492,7 +492,7 @@ states.bg = {
   particles = {},
   update = function (self)
     if #self.particles == 0 then
-        for i = 1, 10 do
+        for _ = 1, 10 do
           add(self.particles,
             {x = rnd(120),
             y = rnd(20) + 120,
