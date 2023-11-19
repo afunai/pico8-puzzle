@@ -437,8 +437,8 @@ states.complete_logo = {
     else
       if self.frame > 0.25 and self.scale >= 4 then
         self.scale = 5
-        self.frame += 5
-        if self.frame > 500 then
+        self.frame += 5.002
+        if self.frame > 1000 then
           self.t = nil
           state = 'complete'
         end
@@ -468,7 +468,7 @@ states.complete = {
     if self.frame == nil then
       self.frame = 16
     elseif self.frame > 0 then
-      self.frame -= 0.3
+      self.frame -= 0.25
     end
 
     if btnp(❎) then
