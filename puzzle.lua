@@ -51,7 +51,7 @@ end
 
 function init_panel_imgs(panels, img_name)
   for panel in all(panels) do
-    panel.img = crop_img(img_name, panel.x, panel.y,
+    panel.img = Pen.crop(img_name, panel.x, panel.y,
       panel.x + panel.width - 1, panel.y + panel.height - 1)
   end
 end
@@ -60,7 +60,7 @@ function prepare_cell(img_name, bg_color, cell, x, y)
   poke(0x5f55, 0x00) -- draw to sprite region
   cls() -- TODO
   rectfill(x, y, x + cell.width - 1, y + cell.height - 1, bg_color)
-  draw_img(img_name, x, y, cell.x, cell.y,
+  Pen.draw(img_name, x, y, cell.x, cell.y,
     cell.x + cell.width - 1, cell.y + cell.height - 1)
   poke(0x5f55, 0x60) -- restore
   return {
@@ -215,7 +215,7 @@ function render_panel(panel_id, cell, ...)
 
   rect(x - 1, y - 1, x + cell.width, y + cell.height, 0)
   if (panel_id != cell.id) pal({0, 5, 5, 5, 5, 6, 7, 5, 6, 6, 6, 6, 6, 6, 6, 0}, 0)
-  draw_img(panels[panel_id].img, x, y)
+  Pen.draw(panels[panel_id].img, x, y)
   pal()
   print(panel_id, x + 2, y + 2, 0)
 end
@@ -246,7 +246,7 @@ end
 
 function render_complete()
   render_background()
-  draw_img(stage.img_name)
+  Pen.draw(stage.img_name)
   print('❎', 118, 119 + (time() * 4 % 2))
 end
 
