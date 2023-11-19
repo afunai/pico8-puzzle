@@ -1,7 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
-#include pen_decoder.lua
+#include pen_decoder.min.lua
 #include pen_data.lua
 #include puzzle.lua
 __gfx__
