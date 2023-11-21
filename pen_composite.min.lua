@@ -1,0 +1,5 @@
+if(Pen==nil)Pen={data={}}
+local function i(n,e)if(n==nil)return nil
+local l={}for o=1,3do for d=1,#n[o]do local n=n[o][d]add(l,{x1=n.x1+e,x2=n.x2+e,p=n.p})end end for n=2,#l do local n=n while(n>1and l[n-1].x1>l[n].x1)l[n],l[n-1]=l[n-1],l[n]n=n-1
+end return l end local function f(l)local n={{},{},{}}for l in all(l)do if l.p<16then add(n[1],l)elseif l.p<=255then add(n[2],l)else add(n[3],l)end end return n end Pen.composite=function(l,e,...)local n,l,e=Pen.get(l),Pen.get(e),{...}local e,d,o=e[1]or 0,e[2]or 0,{}for c=min(d,0)+1,max(d+n.h,l.h)do local n,e=i(n.matrix[c-d],max(e,0)),i(l.matrix[c],max(-e,0))if n==nil then add(o,f(e))elseif e==nil then add(o,f(n))else local d,i={},1local l=e[i]for n in all(n)do while l~=nil and l.x2<=n.x2 do if l.x1<n.x1 then add(d,{x1=l.x1,x2=min(l.x2,n.x1-1),p=l.p})end i+=1l=e[i]end add(d,n)if l~=nil then if l.x1<n.x1 then add(d,{x1=l.x1,x2=n.x1-1,p=l.p})end l.x1=max(l.x1,n.x2+1)end end while(l~=nil)add(d,l)i+=1l=e[i]
+add(o,f(d))end end local d if e>=0then d=max(n.w+e,l.w)else d=max(l.w-e,n.w)end return{name=n.name.." + "..l.name,w=d,h=#o,dpal=l.dpal,vcol=l.vcol,matrix=o}end
