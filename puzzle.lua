@@ -61,8 +61,8 @@ function prepare_cell(bg_color, cell, x, y)
   poke(0x5f55, 0x00) -- draw to sprite region
   cls() -- TODO
   rectfill(x, y, x + cell.width - 1, y + cell.height - 1, bg_color)
-  Pen.draw(panel_img, x, y, cell.x, cell.y,
-    cell.x + cell.width - 1, cell.y + cell.height - 1)
+  Pen.draw(panel_img, x, y,
+    {cell.x, cell.y, cell.x + cell.width - 1, cell.y + cell.height - 1})
   poke(0x5f55, 0x60) -- restore
   return {
     x = x,
