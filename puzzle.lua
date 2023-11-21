@@ -1,3 +1,6 @@
+--preserve: Pen
+if (Pen == nil) Pen = {data = {}}
+
 local stages = {
   {
     dim_x = 2,
