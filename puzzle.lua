@@ -249,13 +249,6 @@ function render_cursor()
   fillp(0)
 end
 
-function render_complete()
-  render_background()
-  Pen.draw(stage.img.base)
-  Pen.draw(stage.img.cloth)
-  print('❎', 118, 119 + (time() * 4 % 2))
-end
-
 --
 
 states = {}
@@ -473,11 +466,26 @@ states.complete = {
   update = function (self)
     if self.frame == nil then
       self.frame = 16
+      self.opacity = 16.5
+      self.frames_from_click = 0
     elseif self.frame > 0 then
       self.frame -= 0.25
     end
 
     if btnp(❎) then
+      if (self.frames_from_click == 0) self.frames_from_click = 1
+      self.opacity -= 0.5
+    end
+
+    if self.frames_from_click > 0 then
+      self.frames_from_click += 1
+      if (self.opacity > 1) self.opacity += self.frames_from_click / 10000
+      if self.frames_from_click == 30 and self.opacity >= 16 then
+        self.opacity = 17 -- not double clicked
+      end
+    end
+
+    if self.opacity > 16.5 or self.frames_from_click > 12 * 60 then
       self.frame = nil
       stage_id += 1
       if (stage_id > #stages) stage_id = 1
@@ -485,7 +493,11 @@ states.complete = {
     end
   end,
   draw = function (self)
-    render_complete()
+    render_background()
+    Pen.draw(stage.img.base)
+    Pen.draw(stage.img.cloth, 0, 0, nil, self.opacity)
+    print('❎', 118, 119 + (time() * 4 % 2), 0)
+
     if self.frame != nil and self.frame > 0 then
       fillp(shades[ceil(self.frame)] + 0b.1)
       rectfill(0, 0, 127, 127, 0)
