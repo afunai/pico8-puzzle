@@ -2,21 +2,21 @@ local stages = {
   {
     dim_x = 2,
     dim_y = 2,
-    img_name = 'test',
+    img = {base = 'test', cloth = 'test_cloth'},
     bg_color = 8,
     music = 0,
   },
   {
     dim_x = 3,
     dim_y = 3,
-    img_name = 'test',
+    img = {base = 'test', cloth = 'test_cloth'},
     bg_color = 9,
     music = 5,
   },
   {
     dim_x = 4,
     dim_y = 4,
-    img_name = 'test',
+    img = {base = 'test', cloth = 'test_cloth'},
     bg_color = 12,
     music = 0,
   },
@@ -24,6 +24,7 @@ local stages = {
 local stage_id = 1
 local stage = stages[1]
 
+local panel_img = nil
 local board = {}
 local panels = {}
 local panel_ids = {}
@@ -49,18 +50,18 @@ function init_matrix(panel_w, panel_h)
   return matrix
 end
 
-function init_panel_imgs(blank_panels, img_name)
+function init_panel_imgs(blank_panels)
   for panel in all(blank_panels) do
-    panel.img = Pen.crop(img_name, panel.x, panel.y,
+    panel.img = Pen.crop(panel_img, panel.x, panel.y,
       panel.x + panel.width - 1, panel.y + panel.height - 1)
   end
 end
 
-function prepare_cell(img_name, bg_color, cell, x, y)
+function prepare_cell(bg_color, cell, x, y)
   poke(0x5f55, 0x00) -- draw to sprite region
   cls() -- TODO
   rectfill(x, y, x + cell.width - 1, y + cell.height - 1, bg_color)
-  Pen.draw(img_name, x, y, cell.x, cell.y,
+  Pen.draw(panel_img, x, y, cell.x, cell.y,
     cell.x + cell.width - 1, cell.y + cell.height - 1)
   poke(0x5f55, 0x60) -- restore
   return {
@@ -247,7 +248,8 @@ end
 
 function render_complete()
   render_background()
-  Pen.draw(stage.img_name)
+  Pen.draw(stage.img.base)
+  Pen.draw(stage.img.cloth)
   print('❎', 118, 119 + (time() * 4 % 2))
 end
 
@@ -258,6 +260,7 @@ states = {}
 states.init = {
   update = function (_)
     stage = stages[stage_id]
+    panel_img = Pen.composite(stage.img.cloth, stage.img.base)
     board = {}
     panels = {}
     panel_ids = {}
@@ -268,7 +271,7 @@ states.init = {
     local panel_h = flr(128 / stage.dim_y)
     board = init_matrix(panel_w, panel_h)
     panels = init_matrix(panel_w, panel_h)
-    init_panel_imgs(panels, stage.img_name)
+    init_panel_imgs(panels)
     panel_ids = {}
     for panel_id = 1, stage.dim_x * stage.dim_y do
       add(panel_ids, panel_id)
@@ -374,7 +377,7 @@ states.last_cell = {
   update = function (self)
     if self.cell == nil then
       local last_cell = panels[#panels]
-      self.cell = prepare_cell(stage.img_name, stage.bg_color, last_cell, 64, 0)
+      self.cell = prepare_cell(stage.bg_color, last_cell, 64, 0)
       self.cx = 127 - last_cell.width / 2
       self.cy = 63 - last_cell.height / 2
       self.angle1 = 0.25
