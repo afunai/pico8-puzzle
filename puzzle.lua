@@ -5,8 +5,8 @@ local stages = {
   {
     dim_x = 2,
     dim_y = 2,
-    img = {base = 'test', cloth = 'test_cloth'},
-    bg_color = 8,
+    img = {base = 'ol_base', cloth = 'ol_cloth'},
+    bg_color = 10,
     music = 0,
   },
   {
