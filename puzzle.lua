@@ -463,6 +463,7 @@ states.complete_logo = {
 }
 
 states.complete = {
+  opacity = 16.5,
   update = function (self)
     if self.frame == nil then
       self.frame = 16
@@ -496,7 +497,7 @@ states.complete = {
     render_background()
     Pen.draw(stage.img.base)
     Pen.draw(stage.img.cloth, 0, 0, nil, self.opacity)
-    print('❎', 118, 119 + (time() * 4 % 2), 0)
+    if (self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
 
     if self.frame != nil and self.frame > 0 then
       fillp(shades[ceil(self.frame)] + 0b.1)
