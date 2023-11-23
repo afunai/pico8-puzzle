@@ -189,7 +189,7 @@ function is_complete()
 end
 
 function render_background()
-  if state == 'complete' then
+  if state == 'complete' or state == 'minigame' then
     cls(stage.bg_color)
   else
     cls()
@@ -201,7 +201,7 @@ function render_background()
       stage.bg_color
     )
   end
-  if state == 'game' or state == 'complete' then
+  if state == 'game' or state == 'complete' or state == 'minigame' then
     states.bg:update()
     states.bg:draw()
   end
@@ -467,16 +467,30 @@ states.complete_logo = {
 }
 
 states.complete = {
-  opacity = 16.5,
+  frame = 16,
   update = function (self)
-    if self.frame == nil then
+    self.frame -= 0.25
+    if self.frame <= 0 then
       self.frame = 16
-      self.opacity = 16.5
-      self.frames_from_click = 0
-    elseif self.frame > 0 then
-      self.frame -= 0.25
+      state = 'minigame'
     end
+  end,
+  draw = function (self)
+    render_background()
+    Pen.draw(stage.img.base)
+    if (stage.img.cloth != nil) Pen.draw(stage.img.cloth)
 
+    fillp(shades[ceil(self.frame)] + 0b.1)
+    rectfill(0, 0, 127, 127, 0)
+    fillp()
+  end,
+}
+
+states.minigame = {
+  opacity = 16.5,
+  frames_from_click = 0,
+
+  update = function (self)
     if btnp(❎) then
       if (self.frames_from_click == 0) self.frames_from_click = 1
       self.opacity -= 0.5
@@ -486,12 +500,13 @@ states.complete = {
       self.frames_from_click += 1
       if (self.opacity > 1) self.opacity += self.frames_from_click / 10000
       if self.frames_from_click == 30 and self.opacity >= 16 then
-        self.opacity = 17 -- not double clicked
+        self.opacity = 17 -- skip minigame if not double clicked
       end
     end
 
     if self.opacity > 16.5 or self.frames_from_click > 12 * 60 then
-      self.frame = nil
+      self.opacity = 16.5
+      self.frames_from_click = 0
       stage_id += 1
       if (stage_id > #stages) stage_id = 1
       state = 'init'
@@ -502,12 +517,6 @@ states.complete = {
     Pen.draw(stage.img.base)
     if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, 0, nil, self.opacity)
     if (self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
-
-    if self.frame != nil and self.frame > 0 then
-      fillp(shades[ceil(self.frame)] + 0b.1)
-      rectfill(0, 0, 127, 127, 0)
-      fillp()
-    end
   end,
 }
 
@@ -525,7 +534,7 @@ states.bg = {
     end
 
     local vy = -0.5
-    if (state == 'complete') vy = -2
+    if (state == 'complete' or state == 'minigame') vy = -2
 
     for p in all(self.particles) do
        p.x += cos(p.deg)
@@ -540,7 +549,7 @@ states.bg = {
   end,
   draw = function (self)
     local char = "\f1\^w\^t?"
-    if (state == 'complete') char = "\f8\^p♥"
+    if (state == 'complete' or state == 'minigame') char = "\f8\^p♥"
 
     for p in all(self.particles) do
       print(char, p.x, p.y)
