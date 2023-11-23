@@ -188,6 +188,45 @@ function is_complete()
   return true
 end
 
+threads = {}
+
+threads.bg = {
+  particles = {},
+  update = function (self)
+    if #self.particles == 0 then
+        for _ = 1, 10 do
+          add(self.particles,
+            {x = rnd(120),
+            y = rnd(20) + 120,
+            deg = rnd(1),
+            vd = (rnd(2) - 1) / 30})
+        end
+    end
+
+    local vy = -0.5
+    if (state == 'complete' or state == 'minigame') vy = -2
+
+    for p in all(self.particles) do
+       p.x += cos(p.deg)
+       p.y += sin(p.deg) + vy
+       p.deg += p.vd
+       if (rnd(10) < 1) p.vd = (rnd(2) - 1) / 30
+       if p.y < -10 then
+         p.x = rnd(120)
+         p.y = rnd(20) + 120
+       end
+    end
+  end,
+  draw = function (self)
+    local char = "\f1\^w\^t?"
+    if (state == 'complete' or state == 'minigame') char = "\f8\^p♥"
+
+    for p in all(self.particles) do
+      print(char, p.x, p.y)
+    end
+  end,
+}
+
 function render_background()
   if state == 'complete' or state == 'minigame' then
     cls(stage.bg_color)
@@ -202,8 +241,8 @@ function render_background()
     )
   end
   if state == 'game' or state == 'complete' or state == 'minigame' then
-    states.bg:update()
-    states.bg:draw()
+    threads.bg:update()
+    threads.bg:draw()
   end
 end
 
@@ -517,43 +556,6 @@ states.minigame = {
     Pen.draw(stage.img.base)
     if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, 0, nil, self.opacity)
     if (self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
-  end,
-}
-
-states.bg = {
-  particles = {},
-  update = function (self)
-    if #self.particles == 0 then
-        for _ = 1, 10 do
-          add(self.particles,
-            {x = rnd(120),
-            y = rnd(20) + 120,
-            deg = rnd(1),
-            vd = (rnd(2) - 1) / 30})
-        end
-    end
-
-    local vy = -0.5
-    if (state == 'complete' or state == 'minigame') vy = -2
-
-    for p in all(self.particles) do
-       p.x += cos(p.deg)
-       p.y += sin(p.deg) + vy
-       p.deg += p.vd
-       if (rnd(10) < 1) p.vd = (rnd(2) - 1) / 30
-       if p.y < -10 then
-         p.x = rnd(120)
-         p.y = rnd(20) + 120
-       end
-    end
-  end,
-  draw = function (self)
-    local char = "\f1\^w\^t?"
-    if (state == 'complete' or state == 'minigame') char = "\f8\^p♥"
-
-    for p in all(self.particles) do
-      print(char, p.x, p.y)
-    end
   end,
 }
 
