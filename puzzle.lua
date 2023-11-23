@@ -225,9 +225,9 @@ function render_panel(panel_id, cell, ...)
   print(panel_id, x + 2, y + 2, 0)
 end
 
-function render_board()
+function render_board(stop_render_blank)
   render_background()
-  render_blank()
+  if (not stop_render_blank) render_blank()
   for i, cell in pairs(board) do
     if (i != blank) render_panel(panel_ids[i], cell)
   end
@@ -384,6 +384,9 @@ states.last_cell = {
         self.cell = nil
         sfx(3, -2)
         sfx(0)
+        render_board(true)
+        render_panel(#panels, board[#board])
+        for _ = 1, 25 do flip() end
         state = 'complete_logo'
       else
         self.angle2 = (self.angle2 + 0.05) % 1
@@ -426,9 +429,6 @@ shades = {
 states.complete_logo = {
   update = function (self)
     if self.t == nil then
-      render_board()
-      render_panel(#panels, board[#board])
-      for _ = 1, 30 do flip() end
       music(7)
       self.t = prepare_text('\f8\|gs\|ht\|ha\|hg\|he\n\|cc\|hl\|he\|ha\|hr', 32, 0)
       self.frame = 0
@@ -448,7 +448,7 @@ states.complete_logo = {
     end
   end,
   draw = function (self)
-    render_board()
+    render_board(true)
     render_panel(#panels, board[#board])
     if self.frame != nil and self.frame > 1 then
       fillp(shades[min(flr(self.frame / 5) + 1, 16)] + 0b.1)
