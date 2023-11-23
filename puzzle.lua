@@ -323,7 +323,6 @@ states.init = {
 }
 
 states.shuffle = {
-  count = nil,
   update = function (self)
     if self.count == nil then
       self.count = stage.dim_x * stage.dim_y * 8 * 2
@@ -335,7 +334,7 @@ states.shuffle = {
       sfx(4)
       panel_ids = shuffle(panel_ids)
     end
-    self.count-= 1
+    self.count -= 1
     if self.count == 0 then
       self.count = nil
       music(stage.music)
