@@ -256,7 +256,11 @@ states = {}
 states.init = {
   update = function (_)
     stage = stages[stage_id]
-    panel_img = Pen.composite(stage.img.cloth, stage.img.base)
+    if stage.img.cloth != nil then
+      panel_img = Pen.composite(stage.img.cloth, stage.img.base)
+    else
+      panel_img = Pen.get(stage.img.base)
+    end
     board = {}
     panels = {}
     panel_ids = {}
@@ -496,7 +500,7 @@ states.complete = {
   draw = function (self)
     render_background()
     Pen.draw(stage.img.base)
-    Pen.draw(stage.img.cloth, 0, 0, nil, self.opacity)
+    if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, 0, nil, self.opacity)
     if (self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
 
     if self.frame != nil and self.frame > 0 then
