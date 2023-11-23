@@ -5,6 +5,13 @@ local stages = {
   {
     dim_x = 2,
     dim_y = 2,
+    img = {base = 'bunny_base'},
+    bg_color = 14,
+    music = 0,
+  },
+  {
+    dim_x = 2,
+    dim_y = 2,
     img = {base = 'ol_base', cloth = 'ol_cloth'},
     bg_color = 10,
     music = 0,
@@ -15,13 +22,6 @@ local stages = {
     img = {base = 'test', cloth = 'test_cloth'},
     bg_color = 9,
     music = 5,
-  },
-  {
-    dim_x = 4,
-    dim_y = 4,
-    img = {base = 'test', cloth = 'test_cloth'},
-    bg_color = 12,
-    music = 0,
   },
 }
 local stage_id = 1
