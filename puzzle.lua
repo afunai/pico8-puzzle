@@ -525,10 +525,14 @@ states.complete = {
 }
 
 states.minigame = {
-  opacity = 16.5,
-  frames_from_click = 0,
-
   update = function (self)
+    if self.frames_from_click == nil then
+      self.frames_from_click = 0
+      self.opacity = 16.5
+      self.max_y = max(panel_img.h - 128, 0)
+      self.vy = 0
+    end
+
     if btnp(❎) then
       if (self.frames_from_click == 0) self.frames_from_click = 1
       self.opacity -= 0.5
@@ -537,14 +541,15 @@ states.minigame = {
     if self.frames_from_click > 0 then
       self.frames_from_click += 1
       if (self.opacity > 1) self.opacity += self.frames_from_click / 10000
-      if self.frames_from_click == 30 and self.opacity >= 16 then
-        self.opacity = 17 -- skip minigame if not double clicked
-      end
     end
 
-    if self.opacity > 16.5 or self.frames_from_click > 12 * 60 then
-      self.opacity = 16.5
-      self.frames_from_click = 0
+    -- game over
+    if (
+      self.frames_from_click > 12 * 60 or -- timeout
+      self.opacity > 16.5 or -- lost
+      (self.frames_from_click == 30 and self.opacity >= 16) -- not double clicked
+    ) then
+      self.frames_from_click = nil
       stage_id += 1
       if (stage_id > #stages) stage_id = 1
       state = 'init'
@@ -552,9 +557,10 @@ states.minigame = {
   end,
   draw = function (self)
     render_background()
-    Pen.draw(stage.img.base)
-    if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, 0, nil, self.opacity)
-    if (self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
+    local y = - (self.max_y or 0)
+    Pen.draw(stage.img.base, 0, y)
+    if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, y, nil, self.opacity)
+    if (self.opacity != nil and self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
   end,
 }
 
