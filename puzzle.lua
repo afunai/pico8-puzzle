@@ -515,8 +515,7 @@ states.complete = {
   end,
   draw = function (self)
     render_background()
-    Pen.draw(stage.img.base)
-    if (stage.img.cloth != nil) Pen.draw(stage.img.cloth)
+    Pen.draw(panel_img)
 
     fillp(shades[ceil(self.frame)] + 0b.1)
     rectfill(0, 0, 127, 127, 0)
