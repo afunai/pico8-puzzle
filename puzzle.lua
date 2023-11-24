@@ -525,12 +525,16 @@ states.complete = {
 }
 
 states.minigame = {
+  y = 0,
+  opacity = 16,
   update = function (self)
     if self.frames_from_click == nil then
       self.frames_from_click = 0
       self.opacity = 16.5
-      self.max_y = max(panel_img.h - 128, 0)
-      self.vy = 0
+      self.min_y = min(128 - panel_img.h, 0)
+      self.radius = abs(self.min_y / 2)
+      self.angle = nil
+      self.y = 0
     end
 
     if btnp(❎) then
@@ -540,7 +544,26 @@ states.minigame = {
 
     if self.frames_from_click > 0 then
       self.frames_from_click += 1
-      if (self.opacity > 1) self.opacity += self.frames_from_click / 10000
+      if self.opacity > 1 then
+         self.opacity += self.frames_from_click / 10000
+      else
+        -- win!
+        if self.angle == nil then
+          -- start auto scroll
+          self.angle = atan2(
+            sqrt(self.radius ^ 2 - (self.radius + self.y) ^ 2),
+            self.radius + self.y
+          )
+        end
+      end
+    end
+
+    if self.angle != nil then
+      -- auto scroll
+      self.y = sin(self.angle) * self.radius - self.radius
+      self.angle = (self.angle + 0.0018) % 1
+    elseif self.frames_from_click > 30 and self.min_y != 0 then
+      self.y = min(0, (16.5 - self.opacity) / 16 * (self.min_y / 2))
     end
 
     -- game over
@@ -557,10 +580,9 @@ states.minigame = {
   end,
   draw = function (self)
     render_background()
-    local y = - (self.max_y or 0)
-    Pen.draw(stage.img.base, 0, y)
-    if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, y, nil, self.opacity)
-    if (self.opacity != nil and self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
+    Pen.draw(stage.img.base, 0, self.y)
+    if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, self.y, nil, self.opacity)
+    if (self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
   end,
 }
 
