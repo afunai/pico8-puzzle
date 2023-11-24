@@ -209,7 +209,7 @@ function render_panel(panel_id, cell, ...)
   rect(x - 1, y - 1, x + cell.width, y + cell.height, 0)
   if (panel_id != cell.id) pal({0, 5, 5, 5, 5, 6, 7, 5, 6, 6, 6, 6, 6, 6, 6, 0}, 0)
   Pen.draw(panels[panel_id].img, x, y)
-  pal()
+  pal(0)
   print(panel_id, x + 2, y + 2, 0)
 end
 
