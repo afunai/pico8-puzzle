@@ -554,6 +554,7 @@ states.minigame = {
             sqrt(self.radius ^ 2 - (self.radius + self.y) ^ 2),
             self.radius + self.y
           )
+          self.frames_from_click -= 3 * 60
         end
       end
     end
@@ -561,7 +562,11 @@ states.minigame = {
     if self.angle != nil then
       -- auto scroll
       self.y = sin(self.angle) * self.radius - self.radius
-      self.angle = (self.angle + 0.0018) % 1
+      if self.y < -0.5 then
+        self.angle = (self.angle + 0.0018) % 1
+      else
+        self.y = 0 -- stop at top position
+      end
     elseif self.frames_from_click > 30 and self.min_y != 0 then
       self.y = min(0, (16.5 - self.opacity) / 16 * (self.min_y / 2))
     end
