@@ -295,23 +295,24 @@ states = {}
 states.init = {
   update = function (_)
     stage = stages[stage_id]
+    board = {}
+    panels = {}
+    panel_ids = {}
+    panel_img = nil
+    blank = stage.dim_x * stage.dim_y
+    active_cell_id = 1
+
     if stage.img.cloth != nil then
       panel_img = Pen.composite(stage.img.cloth, stage.img.base)
     else
       panel_img = Pen.get(stage.img.base)
     end
-    board = {}
-    panels = {}
-    panel_ids = {}
-    blank = stage.dim_x * stage.dim_y
-    active_cell_id = 1
 
     local panel_w = flr(128 / stage.dim_x)
     local panel_h = flr(128 / stage.dim_y)
     board = init_matrix(panel_w, panel_h)
     panels = init_matrix(panel_w, panel_h)
     init_panel_imgs(panels)
-    panel_ids = {}
     for panel_id = 1, stage.dim_x * stage.dim_y do
       add(panel_ids, panel_id)
     end
