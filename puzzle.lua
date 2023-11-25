@@ -98,17 +98,17 @@ end
 
 --
 
-moves = {
-  ⬅️ = {
+local moves = {
+  {
     is_possible = function(cell_id) return cell_id == blank + 1 and blank % stage.dim_x != 0 end,
     vx = -1, vy = 0},
-  ➡️ = {
+  {
     is_possible = function(cell_id) return cell_id == blank - 1 and blank % stage.dim_x != 1 end,
     vx = 1, vy = 0},
-  ⬆️ = {
+  {
     is_possible = function(cell_id) return cell_id == blank + stage.dim_x end,
     vx = 0, vy = -1},
-  ⬇️ = {
+  {
     is_possible = function(cell_id) return cell_id == blank - stage.dim_x end,
     vx = 0, vy = 1},
 }
@@ -118,7 +118,7 @@ local prev_cell_id = nil
 function get_possible_moves()
   local possible_moves = {}
   for cell_id, _ in pairs(panel_ids) do
-    for _, move in pairs(moves) do
+    for move in all(moves) do
       if move.is_possible(cell_id) and cell_id != prev_cell_id then
         add(possible_moves, cell_id)
       end
@@ -230,7 +230,7 @@ end
 
 function render_cursor()
   local moveable = false
-  for _, move in pairs(moves) do
+  for move in all(moves) do
     if (move.is_possible(active_cell_id)) moveable = true
   end
 
@@ -321,7 +321,7 @@ states.game = {
     if (btnp(⬇️) and active_cell_id <= stage.dim_x * (stage.dim_y - 1)) active_cell_id += stage.dim_x
 
     if btnp(❎) then
-      for _, move in pairs(moves) do
+      for move in all(moves) do
         if move.is_possible(active_cell_id) then
           sfx(0)
           states.sliding.move = move
