@@ -252,6 +252,33 @@ end
 
 states = {}
 
+states.title = {
+  text = '\f8press ❎\nto start',
+  title = '\f8panels\n  \-i&\n\-igirls',
+  update = function (self)
+    if (not self.bt) self.bt = prepare_text(self.text, 0, 0)
+    if (not self.tt) self.tt = prepare_text(self.title, 0, 0)
+
+    if btnp(❎) then
+      self.tt = nil
+      stage_id = 1
+      state = 'init'
+    end
+
+    if (time() % 6 > 5) then
+      self.x = cos(time() / 4) * 2.5
+      self.y = cos(time() / 3) * 2.5
+    end
+  end,
+  draw = function (self)
+    cls(12)
+    render_complete_background()
+    Pen.draw('bunny_base', self.x, self.y)
+    balloon(self.text, self.bt, 15, 55)
+    if (self.tt) symbol(20, 20, self.tt, 2, 2)
+  end,
+}
+
 states.init = {
   update = function (_)
     stage = stages[stage_id]
@@ -573,8 +600,7 @@ states.minigame_win = {
     if self.frames > 5 * 60 then
       self.frames = nil
       stage_id += 1
-      if (stage_id > #stages) stage_id = 1
-      state = 'init'
+      if (stage_id > #stages) state = 'title' else state = 'init'
     end
   end,
   draw = function (self)
@@ -585,7 +611,7 @@ states.minigame_win = {
 }
 
 function _init()
-  state = 'init'
+  state = 'title'
 end
 
 function _update60()
