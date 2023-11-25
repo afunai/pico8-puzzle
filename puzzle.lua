@@ -127,14 +127,13 @@ function get_possible_moves()
   return possible_moves
 end
 
-function shuffle(current_panel_ids)
+function shuffle()
   local possible_moves = get_possible_moves()
   local cell_id = possible_moves[flr(rnd(#possible_moves)) + 1]
-  current_panel_ids[blank], current_panel_ids[cell_id] =
-    current_panel_ids[cell_id], current_panel_ids[blank]
+  panel_ids[blank], panel_ids[cell_id] = panel_ids[cell_id], panel_ids[blank]
   blank = cell_id
   prev_cell_id = cell_id
-  return current_panel_ids
+  return panel_ids
 end
 
 function is_complete()
@@ -289,7 +288,7 @@ states.shuffle = {
 
     if (self.count % 2 == 0) then
       sfx(4)
-      panel_ids = shuffle(panel_ids)
+      shuffle()
     end
     self.count -= 1
     if self.count == 0 then
