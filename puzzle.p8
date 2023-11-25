@@ -7,6 +7,7 @@ __lua__
 #include pen_data2.lua
 #include pen_data3.lua
 #include pen_data4.lua
+#include pen_data_candy.lua
 #include pen_data7.lua
 #include symbol.lua
 #include puzzle.lua
