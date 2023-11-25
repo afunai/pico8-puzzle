@@ -48,3 +48,20 @@ function symbol(x, y, t, ...)
     end
   end
 end
+
+function balloon(text, x, y)
+  local t = prepare_text(text, 0, 0)
+  local corner_radius = 3
+
+  oy = cos(time() / 0.7 % 1) * 2
+
+  rectfill(x, y - corner_radius + oy, x + t.w - 1, y + t.h + corner_radius + oy, 7)
+  rectfill(x - corner_radius - 1, y + oy, x + t.w + corner_radius - 1, y + t.h + oy, 7)
+  circfill(x - 1, y + oy, corner_radius, 7)
+  circfill(x + t.w - 1, y + oy, corner_radius, 7)
+  circfill(x - 1, y + t.h + oy, corner_radius, 7)
+  circfill(x + t.w - 1, y + t.h + oy, corner_radius, 7)
+  ovalfill(x + t.w / 2 - 2, y + t.h - 2 + oy, x + t.w / 2 + 2, y + t.h + 6 + oy, 7)
+
+  print(text, x, y + oy + 1, 0)
+end
