@@ -147,7 +147,7 @@ threads = {}
 
 threads.bg = {
   particles = {},
-  update = function (self)
+  update = function (self, is_complete)
     if #self.particles == 0 then
         for _ = 1, 10 do
           add(self.particles,
@@ -159,7 +159,7 @@ threads.bg = {
     end
 
     local vy = -0.5
-    if (state == 'complete' or state == 'minigame') vy = -2
+    if (is_complete) vy = -2
 
     for p in all(self.particles) do
        p.x += cos(p.deg)
@@ -172,9 +172,9 @@ threads.bg = {
        end
     end
   end,
-  draw = function (self)
+  draw = function (self, is_complete)
     local char = "\f1\^w\^t?"
-    if (state == 'complete' or state == 'minigame') char = "\f8\^p♥"
+    if (is_complete) char = "\f8\^p♥"
 
     for p in all(self.particles) do
       print(char, p.x, p.y)
@@ -182,23 +182,23 @@ threads.bg = {
   end,
 }
 
-function render_background()
-  if state == 'complete' or state == 'minigame' then
-    cls(stage.bg_color)
-  else
-    cls()
-    rectfill(
-      board[1].x,
-      board[1].y,
-      board[#board].x + board[#board].width,
-      board[#board].y + board[#board].height,
-      stage.bg_color
-    )
-  end
-  if state == 'game' or state == 'complete' or state == 'minigame' then
-    threads.bg:update()
-    threads.bg:draw()
-  end
+function render_board_background()
+  cls()
+  rectfill(
+    board[1].x,
+    board[1].y,
+    board[#board].x + board[#board].width,
+    board[#board].y + board[#board].height,
+    stage.bg_color
+  )
+  threads.bg:update(false)
+  threads.bg:draw(false)
+end
+
+function render_complete_background()
+  cls(stage.bg_color)
+  threads.bg:update(true)
+  threads.bg:draw(true)
 end
 
 function render_blank()
@@ -220,7 +220,7 @@ function render_panel(panel_id, cell, ...)
 end
 
 function render_board(stop_render_blank)
-  render_background()
+  render_board_background()
   if (not stop_render_blank) render_blank()
   for i, cell in pairs(board) do
     if (i != blank) render_panel(panel_ids[i], cell)
@@ -353,7 +353,7 @@ states.sliding = {
     end
   end,
   draw = function (self)
-    render_background()
+    render_board_background()
     render_blank()
     for i, cell in pairs(board) do
       if (i != active_cell_id and i != blank) render_panel(panel_ids[i], cell)
@@ -470,7 +470,7 @@ states.complete = {
     end
   end,
   draw = function (self)
-    render_background()
+    render_complete_background()
     Pen.draw(panel_img)
 
     fillp(shades[ceil(self.frame)] + 0b.1)
@@ -539,7 +539,7 @@ states.minigame = {
     end
   end,
   draw = function (self)
-    render_background()
+    render_complete_background()
     Pen.draw(stage.img.base, 0, self.y)
     if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, self.y, nil, self.opacity)
     if (self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
