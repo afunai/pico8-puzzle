@@ -500,17 +500,19 @@ states.minigame = {
 
     if self.frames_from_click > 0 then
       self.frames_from_click += 1
+
       if self.opacity > 1 then
          self.opacity += self.frames_from_click / 10000
       else
         -- win!
+        self.frames_from_click = 0 -- stop timeout
+
         if self.angle == nil then
           -- start auto scroll
           self.angle = atan2(
             sqrt(self.radius ^ 2 - (self.radius + self.y) ^ 2),
             self.radius + self.y
           )
-          self.frames_from_click -= 3 * 60
         end
       end
     end
@@ -521,9 +523,12 @@ states.minigame = {
       if self.y < -0.5 then
         self.angle = (self.angle + 0.0018) % 1
       else
-        self.y = 0 -- stop at top position
+        -- finish auto scroll
+        self.frames_from_click = nil
+        state = 'minigame_win'
+        return
       end
-    elseif self.frames_from_click > 30 and self.min_y != 0 then
+    elseif self.frames_from_click > 30 then
       self.y = min(0, (16.5 - self.opacity) / 16 * (self.min_y / 2))
     end
 
@@ -544,6 +549,25 @@ states.minigame = {
     Pen.draw(stage.img.base, 0, self.y)
     if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, self.y, nil, self.opacity)
     if (self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
+  end,
+}
+
+states.minigame_win = {
+  update = function (self)
+    if (self.frames == nil) self.frames = 0
+
+    self.frames += 1
+    if self.frames > 5 * 60 then
+      self.frames = nil
+      stage_id += 1
+      if (stage_id > #stages) stage_id = 1
+      state = 'init'
+    end
+  end,
+  draw = function (self)
+    render_complete_background()
+    Pen.draw(stage.img.base)
+    balloon(stage.balloon.text, stage.balloon.x, stage.balloon.y)
   end,
 }
 
