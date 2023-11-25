@@ -412,6 +412,8 @@ states.last_cell = {
 }
 
 shades = {
+  0b1111111111111111,
+
   0b1111111111111011,
   0b1111011111111101,
   0b1111111011111010,
@@ -432,6 +434,7 @@ shades = {
 }
 
 states.complete_logo = {
+  max_frames = 800,
   update = function (self)
     if self.t == nil then
       music(7)
@@ -442,7 +445,7 @@ states.complete_logo = {
       if self.frame > 0.25 and self.scale >= 4 then
         self.scale = 5
         self.frame += 5.002
-        if self.frame > 1000 then
+        if self.frame > self.max_frames then
           self.t = nil
           state = 'complete'
         end
@@ -453,26 +456,30 @@ states.complete_logo = {
     end
   end,
   draw = function (self)
-    render_board(true)
-    render_panel(#panels, board[#board])
-    if self.frame != nil and self.frame > 1 then
-      fillp(shades[min(flr(self.frame / 5) + 1, 16)] + 0b.1)
+    if (self.t == nil) return
+
+    if self.frame / 5 < 17 then
+      -- fade out the panels
+      render_board(true)
+      render_panel(#panels, board[#board])
+      fillp(shades[flr(self.frame / 5) + 1] + 0b.1)
       rectfill(0, 0, 127, 127, 0)
       fillp()
+    else
+      cls()
     end
-    if self.t != nil then
-      symbol(65 - self.t.w / 2, 65 - self.t.h / 2,
-        self.t, cos(self.frame * 5) * self.scale, abs(self.scale))
-    end
+
+    symbol(65 - self.t.w / 2, 65 - self.t.h / 2,
+      self.t, cos(self.frame * 5) * self.scale, abs(self.scale))
   end,
 }
 
 states.complete = {
-  frame = 16,
+  frame = 17,
   update = function (self)
     self.frame -= 0.25
     if self.frame <= 0 then
-      self.frame = 16
+      self.frame = 17
       state = 'minigame'
     end
   end,
