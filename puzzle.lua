@@ -90,8 +90,9 @@ function rotate_cell(c, x, y, angle)
     for ox = -s, s do
       local sx = (cs * ox - sn * oy) + c.w / 2
       local sy = (cs * oy + sn * ox) + c.h / 2
-      local col = sget(sx + c.x, sy + c.y)
-      if (col > 0) pset(x + ox, y + oy, col)
+      if sx >= 0 and sx < c.w and sy >= 0 and sy <= c.h then -- opaque square
+        pset(x + ox, y + oy, sget(sx + c.x, sy + c.y))
+      end
     end
   end
 end
