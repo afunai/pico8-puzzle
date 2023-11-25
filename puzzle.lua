@@ -173,7 +173,7 @@ threads.bg = {
     end
   end,
   draw = function (self, is_complete)
-    local char = "\f1\^w\^t?"
+    local char = "\f7\^w\^t?"
     if (is_complete) char = "\f8\^p♥"
 
     for p in all(self.particles) do
