@@ -277,6 +277,8 @@ states.init = {
       add(panel_ids, panel_id)
     end
 
+    if (stage.balloon.t == nil) stage.balloon.t = prepare_text(stage.balloon.text, 0, 0)
+
     state = 'shuffle'
   end,
   draw = function (_)
@@ -571,7 +573,7 @@ states.minigame_win = {
   draw = function (self)
     render_complete_background()
     Pen.draw(stage.img.base)
-    balloon(stage.balloon.text, stage.balloon.x, stage.balloon.y)
+    balloon(stage.balloon.text, stage.balloon.t, stage.balloon.x, stage.balloon.y)
   end,
 }
 
