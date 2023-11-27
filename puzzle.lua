@@ -281,6 +281,8 @@ states.title = {
 
 states.init = {
   update = function (_)
+    Pen.cache = nil -- prevent 'out of memory'
+
     stage = stages[stage_id]
     board = {}
     panels = {}
