@@ -264,16 +264,11 @@ states.title = {
       stage_id = 1
       state = 'init'
     end
-
-    if (time() % 6 > 5) then
-      self.x = cos(time() / 4) * 2.5
-      self.y = cos(time() / 3) * 2.5
-    end
   end,
   draw = function (self)
     cls(12)
     render_complete_background()
-    Pen.draw('bunny_base', self.x, self.y)
+    Pen.draw('bunny_base', 0, cos(time() / 3) * 2.5)
     balloon(self.text, self.bt, 15, 55)
     if (self.tt) symbol(20, 20, self.tt, 2, 2)
   end,
