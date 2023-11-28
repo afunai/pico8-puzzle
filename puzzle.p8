@@ -3,12 +3,13 @@ version 41
 __lua__
 #include pen_decoder.min.lua
 #include pen_composite.min.lua
-#include pen_data.lua
-#include pen_data2.lua
-#include pen_data3.lua
-#include pen_data4.lua
-#include pen_data_candy.lua
-#include pen_data7.lua
+#include pen_data/swimsuit_base.lua
+#include pen_data/swimsuit_cloth.lua
+#include pen_data/teacher_base.lua
+#include pen_data/teacher_cloth.lua
+#include pen_data/candy_base.lua
+#include pen_data/bunny_base.lua
+#include pen_data/bunny_eye.lua
 #include symbol.lua
 #include puzzle.lua
 __sfx__
