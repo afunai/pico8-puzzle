@@ -5,7 +5,7 @@ local stages = {
   {
     dim_x = 2,
     dim_y = 2,
-    img = {base = 'test', cloth = 'test_cloth'},
+    img = {base = 'swimsuit_base', cloth = 'swimsuit_cloth'},
     bg_color = 12,
     music = 5,
     balloon = {text = 'you\'ll\nget soaked\nif you\'re\nnear me!', x = 80, y = 9},
@@ -13,7 +13,7 @@ local stages = {
   {
     dim_x = 2,
     dim_y = 2,
-    img = {base = 'ol_base', cloth = 'ol_cloth'},
+    img = {base = 'teacher_base', cloth = 'teacher_cloth'},
     bg_color = 10,
     music = 0,
     balloon = {text = 'it\'s\nyour\nturn\nto\nteach\nme\f8♥', x = 77, y = 8},
