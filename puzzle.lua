@@ -574,6 +574,7 @@ states.minigame = {
 
     -- game over
     if (
+      (not nsfw_mode() and self.frames_from_click > 0) or -- skip minigame
       self.frames_from_click > 12 * 60 or -- timeout
       self.opacity > 16.5 or -- lost
       (self.frames_from_click == 30 and self.opacity >= 16) -- not double clicked
@@ -588,7 +589,7 @@ states.minigame = {
     render_complete_background()
     Pen.draw(stage.img.base, 0, self.y)
     if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, self.y, nil, self.opacity)
-    if (self.opacity > 1) print('❎', 118, 119 + (time() * 8 % 2), 0)
+    if (self.opacity > 1) print('❎', 118, 119 + (time() * (2 + dget(0) * 6) % 2), 0)
   end,
 }
 
@@ -610,7 +611,26 @@ states.minigame_win = {
   end,
 }
 
+function nsfw_mode()
+  return dget(0) == 1
+end
+
+function menu_nsfw_label()
+  if (nsfw_mode()) return 'nsfw: on' else return 'nsfw: off'
+end
+
+function menu_nsfw(b)
+  if b & 32 > 0 then
+    dset(0, 1 - dget(0))
+    menuitem(_, menu_nsfw_label())
+  end
+  return true
+end
+
 function _init()
+  cartdata('afunai_pandg_1')
+  menuitem(1, menu_nsfw_label(), menu_nsfw)
+
   state = 'title'
 end
 
