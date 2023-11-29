@@ -32,7 +32,7 @@ local stages = {
     img = {base = 'bunny_base'},
     bg_color = 14,
     music = 0,
-    balloon = {text = '\fethank you\nfor\nplaying\nwith us\f8♥\n\fesee you\nsoon!', x = 15, y = 15},
+    balloon = {text = '\f8game over\n\|j\fethank you\nfor\nplaying\nwith us\f8♥', x = 13, y = 15},
   },
 }
 local stage_id = 1
@@ -600,7 +600,7 @@ states.minigame_win = {
     if self.frames > 5 * 60 then
       self.frames = nil
       stage_id += 1
-      if (stage_id > #stages) state = 'title' else state = 'init'
+      if (stage_id <= #stages) state = 'init'
     end
   end,
   draw = function (self)
