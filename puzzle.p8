@@ -9,7 +9,7 @@ __lua__
 #include pen_data/teacher_cloth.lua
 #include pen_data/candy_base.lua
 #include pen_data/bunny_base.lua
-#include pen_data/bunny_eye.lua
+#include pen_data/bunny_wink.lua
 #include symbol.lua
 #include puzzle.lua
 __sfx__

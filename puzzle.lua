@@ -268,7 +268,8 @@ states.title = {
   draw = function (self)
     cls(12)
     render_complete_background()
-    Pen.draw('bunny_base', 0, cos(time() / 3) * 2.5)
+    Pen.draw('bunny_base', 2, cos(time() / 3) * 2.5)
+    if (time() % 10 > 9.5) Pen.draw('bunny_wink', 2, cos(time() / 3) * 2.5)
     balloon(self.text, self.bt, 15, 55)
     if (self.tt) symbol(20, 20, self.tt, 2, 2)
   end,
