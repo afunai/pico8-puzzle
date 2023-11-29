@@ -545,7 +545,7 @@ states.minigame = {
          self.opacity += self.frames_from_click / 10000
       else
         -- win!
-        self.frames_from_click = 0 -- stop timeout
+        self.frames_from_click = 1 -- stop timeout
 
         if self.angle == nil then
           -- start auto scroll
@@ -587,8 +587,12 @@ states.minigame = {
   end,
   draw = function (self)
     render_complete_background()
-    Pen.draw(stage.img.base, 0, self.y)
-    if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, self.y, nil, self.opacity)
+    if self.frames_from_click != nil and self.frames_from_click > 0 then
+      Pen.draw(stage.img.base, 0, self.y)
+      if (stage.img.cloth != nil) Pen.draw(stage.img.cloth, 0, self.y, nil, self.opacity)
+    else
+      Pen.draw(panel_img)
+    end
     if (self.opacity > 1) print('❎', 118, 119 + (time() * (2 + dget(0) * 6) % 2), 0)
   end,
 }
