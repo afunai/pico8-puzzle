@@ -488,10 +488,10 @@ states.complete_logo = {
       render_board(true)
       render_panel(#panels, board[#board])
       fillp(shades[flr(self.frame / 5) + 1] + 0b.1)
-      rectfill(0, 0, 127, 127, 14)
+      rectfill(0, 0, 127, 127, stage.bg_color)
       fillp()
     else
-      cls(14)
+      render_complete_background()
     end
 
     if (cos(self.frame * 5) < 0) pal(8, 6, 0)
