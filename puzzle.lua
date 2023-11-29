@@ -469,7 +469,7 @@ states.complete_logo = {
     else
       if self.frame > 0.25 and self.scale >= 4 then
         self.scale = 5
-        self.frame += 5.002
+        self.frame += 5.0014
         if self.frame > self.max_frames then
           self.t = nil
           state = 'complete'
@@ -488,14 +488,16 @@ states.complete_logo = {
       render_board(true)
       render_panel(#panels, board[#board])
       fillp(shades[flr(self.frame / 5) + 1] + 0b.1)
-      rectfill(0, 0, 127, 127, 0)
+      rectfill(0, 0, 127, 127, 14)
       fillp()
     else
-      cls()
+      cls(14)
     end
 
+    if (cos(self.frame * 5) < 0) pal(8, 6, 0)
     symbol(65 - self.t.w / 2, 65 - self.t.h / 2,
       self.t, cos(self.frame * 5) * self.scale, abs(self.scale))
+    pal(0)
   end,
 }
 
