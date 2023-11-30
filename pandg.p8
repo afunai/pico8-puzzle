@@ -1,6 +1,9 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
+-- panels & girls
+-- by afunai
+
 #include pen_decoder.min.lua
 #include pen_composite.min.lua
 #include pen_data/swimsuit_base.lua
