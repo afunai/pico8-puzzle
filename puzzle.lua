@@ -638,7 +638,7 @@ end
 function menu_nsfw(b)
   if b & 32 > 0 then
     dset(0, 1 - dget(0))
-    menuitem(_, menu_nsfw_label())
+    menuitem(1, menu_nsfw_label())
   end
   return true
 end
