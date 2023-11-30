@@ -152,7 +152,7 @@ threads = {}
 
 threads.bg = {
   particles = {},
-  update = function (self, is_complete)
+  update = function (self, in_game)
     if #self.particles == 0 then
         for _ = 1, 10 do
           add(self.particles,
@@ -164,7 +164,7 @@ threads.bg = {
     end
 
     local vy = -0.5
-    if (is_complete) vy = -2
+    if (not in_game) vy = -2
 
     for p in all(self.particles) do
        p.x += cos(p.deg)
@@ -177,15 +177,15 @@ threads.bg = {
        end
     end
   end,
-  draw = function (self, is_complete)
+  draw = function (self, in_game)
     local char = "\f7\^w\^t?"
-    if (is_complete) char = "\f8\^p♥"
+    if (not in_game) char = "\f8\^p♥"
 
     for p in all(self.particles) do
       print(char, p.x, p.y)
     end
 
-    if not is_complete then
+    if in_game then
       -- repaint the frame :(
       local rx1 = board[1].x - 1
       local ry1 = board[1].y - 1
@@ -208,14 +208,14 @@ function render_board_background()
     board[#board].y + board[#board].height,
     stage.bg_color
   )
-  threads.bg:update(false)
-  threads.bg:draw(false)
+  threads.bg:update(true)
+  threads.bg:draw(true)
 end
 
 function render_complete_background()
   cls(stage.bg_color)
-  threads.bg:update(true)
-  threads.bg:draw(true)
+  threads.bg:update(false)
+  threads.bg:draw(false)
 end
 
 function render_blank()
