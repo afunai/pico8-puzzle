@@ -184,6 +184,18 @@ threads.bg = {
     for p in all(self.particles) do
       print(char, p.x, p.y)
     end
+
+    if not is_complete then
+      -- repaint the frame :(
+      local rx1 = board[1].x - 1
+      local ry1 = board[1].y - 1
+      local rx2 = board[#board].x + board[#board].width
+      local ry2 = board[#board].y + board[#board].height
+      if (rx1 > 0) rectfill(0, 0, rx1, 127, 0)
+      if (rx2 < 127) rectfill(rx2, 0, 127, 127, 0)
+      if (ry1 > 0) rectfill(0, 0, 127, ry1, 0)
+      if (ry2 < 127) rectfill(0, ry2, 127, 127, 0)
+    end
   end,
 }
 
