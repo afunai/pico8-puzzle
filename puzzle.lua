@@ -624,6 +624,7 @@ states.minigame_win = {
   draw = function (self)
     render_complete_background()
     Pen.draw(stage.img.base)
+    if (stage_id == #stages) Pen.draw('bunny_wink')
     balloon(stage.balloon.text, stage.balloon.t, stage.balloon.x, stage.balloon.y)
   end,
 }
