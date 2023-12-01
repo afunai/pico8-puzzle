@@ -326,7 +326,8 @@ states.shuffle = {
   update = function (self)
     if self.count == nil then
       self.count = stage.dim_x * stage.dim_y * 8 * 3
-      self.t = prepare_text('\f1stage '..stage_id, 32, 0)
+      color(stage.bg_color + 1)
+      self.t = prepare_text('stage '..stage_id, 32, 0)
       music(-1)
     end
 
