@@ -619,6 +619,7 @@ states.minigame_win = {
       self.frames = nil
       stage_id += 1
       if (stage_id <= #stages) state = 'init'
+      if (stage_id > #stages) stage_id = #stages + 1 -- prevent overflow
     end
   end,
   draw = function (self)
